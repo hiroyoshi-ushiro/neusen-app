@@ -1,0 +1,4826 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0A0E27">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="NEUSEN">
+<title>NEUSEN — Human OS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Brand colors derived from logo */
+    --brand-blue: #5B8FF9;
+    --brand-blue-light: #8AB4FB;
+    --brand-purple: #9B6CE3;
+    --brand-purple-deep: #6B46C1;
+    --brand-cyan: #00D4FF;
+    --brand-mint: #06D6A0;
+    --brand-pink: #E85AAB;
+    --brand-gold: #FFD700;
+    --brand-red: #FF5E6C;
+
+    /* Backgrounds */
+    --bg-deep: #050715;
+    --bg-base: #0A0E27;
+    --bg-elevated: #131736;
+    --bg-card: rgba(255, 255, 255, 0.04);
+    --bg-card-hover: rgba(255, 255, 255, 0.07);
+
+    /* Text */
+    --text-primary: #FFFFFF;
+    --text-secondary: rgba(255, 255, 255, 0.72);
+    --text-tertiary: rgba(255, 255, 255, 0.45);
+    --text-faint: rgba(255, 255, 255, 0.28);
+
+    /* Borders */
+    --border-subtle: rgba(255, 255, 255, 0.06);
+    --border-default: rgba(255, 255, 255, 0.1);
+    --border-strong: rgba(255, 255, 255, 0.18);
+
+    /* Shadows */
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
+    --shadow-lg: 0 24px 56px rgba(0, 0, 0, 0.5);
+    --shadow-glow: 0 8px 32px rgba(91, 143, 249, 0.3);
+    --shadow-glow-purple: 0 8px 32px rgba(155, 108, 227, 0.35);
+
+    /* Radii */
+    --r-sm: 8px;
+    --r-md: 12px;
+    --r-lg: 16px;
+    --r-xl: 20px;
+    --r-2xl: 28px;
+
+    /* Spacing */
+    --safe-top: env(safe-area-inset-top, 0);
+    --safe-bottom: env(safe-area-inset-bottom, 0);
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  html, body {
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  body {
+    background:
+      radial-gradient(ellipse 70% 50% at 100% 0%, rgba(155, 108, 227, 0.18) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 0% 100%, rgba(91, 143, 249, 0.13) 0%, transparent 60%),
+      radial-gradient(ellipse 80% 60% at 50% 50%, rgba(0, 212, 255, 0.04) 0%, transparent 70%),
+      linear-gradient(180deg, var(--bg-base) 0%, var(--bg-deep) 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    color: var(--text-primary);
+    font-family: 'Noto Sans JP', 'Space Grotesk', sans-serif;
+    font-weight: 400;
+    line-height: 1.6;
+    letter-spacing: 0.01em;
+    padding: calc(var(--safe-top) + 16px) 16px calc(var(--safe-bottom) + 80px);
+    overscroll-behavior-y: contain;
+  }
+
+  ::selection {
+    background: rgba(155, 108, 227, 0.4);
+    color: white;
+  }
+
+  .container {
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  /* ========================================
+     LOGO COMPONENT (SVG-based, multiple sizes)
+     ======================================== */
+  .logo-mark {
+    display: inline-block;
+    vertical-align: middle;
+  }
+  .logo-full {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .logo-text-block {
+    display: flex;
+    flex-direction: column;
+    line-height: 1;
+  }
+  .logo-text-main {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    background: linear-gradient(135deg, var(--brand-blue-light) 0%, var(--brand-blue) 50%, var(--brand-purple) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .logo-text-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 400;
+    color: var(--text-tertiary);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+  }
+
+  /* ========================================
+     HEADER
+     ======================================== */
+  .app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .header-logo .logo-text-main { font-size: 16px; }
+  .header-logo .logo-text-sub { font-size: 8px; margin-top: 3px; }
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .user-info-text { text-align: right; }
+  .user-info-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 500;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+  .user-info-date {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--text-faint);
+    margin-top: 2px;
+    letter-spacing: 0.05em;
+  }
+  .streak-badge {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(232, 90, 171, 0.15));
+    border: 1px solid rgba(255, 215, 0, 0.25);
+    border-radius: 100px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 11px;
+    color: var(--brand-gold);
+  }
+  .streak-badge.zero { opacity: 0.4; }
+
+  /* ========================================
+     TABS
+     ======================================== */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 24px;
+    background: rgba(255, 255, 255, 0.025);
+    border-radius: var(--r-md);
+    padding: 4px;
+    border: 1px solid var(--border-subtle);
+    backdrop-filter: blur(10px);
+  }
+  .tab {
+    flex: 1;
+    padding: 11px 4px;
+    text-align: center;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 8px;
+    letter-spacing: 0.14em;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: var(--r-sm);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    color: var(--text-tertiary);
+    background: transparent;
+    border: none;
+    position: relative;
+  }
+  .tab.active {
+    background: linear-gradient(135deg, var(--brand-purple) 0%, var(--brand-blue) 100%);
+    color: white;
+    box-shadow: var(--shadow-glow-purple);
+  }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; animation: fadeSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+  @keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ========================================
+     LOGIN SCREEN (refined)
+     ======================================== */
+  .login-screen {
+    text-align: center;
+    padding: 56px 24px 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 80vh;
+    justify-content: center;
+  }
+  .login-screen .logo-mark {
+    margin-bottom: 32px;
+    animation: logoPulse 4s ease-in-out infinite;
+  }
+  @keyframes logoPulse {
+    0%, 100% { filter: drop-shadow(0 0 24px rgba(155, 108, 227, 0.4)); }
+    50% { filter: drop-shadow(0 0 40px rgba(91, 143, 249, 0.6)); }
+  }
+  .login-text-block {
+    margin-bottom: 12px;
+  }
+  .login-text-block .logo-text-main { font-size: 36px; }
+  .login-text-block .logo-text-sub { font-size: 11px; margin-top: 8px; }
+
+  .login-tagline {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin: 36px 0 48px;
+    line-height: 1.9;
+    max-width: 320px;
+    font-weight: 300;
+  }
+  .login-tagline strong {
+    background: linear-gradient(135deg, var(--brand-cyan), var(--brand-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 600;
+  }
+
+  .google-signin-btn {
+    background: white;
+    color: #1a1a1a;
+    border: none;
+    border-radius: var(--r-md);
+    padding: 14px 28px;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: var(--shadow-md);
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .google-signin-btn:active {
+    transform: scale(0.97);
+    box-shadow: var(--shadow-sm);
+  }
+  .google-icon { width: 18px; height: 18px; }
+
+  .login-note {
+    margin-top: 36px;
+    font-size: 11px;
+    color: var(--text-faint);
+    line-height: 1.7;
+    max-width: 280px;
+  }
+
+  /* ========================================
+     HOS DISPLAY (premium rebuild)
+     ======================================== */
+  .hos-display {
+    background:
+      linear-gradient(165deg, rgba(155, 108, 227, 0.12) 0%, rgba(91, 143, 249, 0.06) 60%, rgba(0, 212, 255, 0.04) 100%);
+    border: 1px solid var(--border-default);
+    border-radius: var(--r-2xl);
+    padding: 28px 24px 24px;
+    text-align: center;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  .hos-display::before {
+    content: '';
+    position: absolute;
+    top: -120px;
+    right: -120px;
+    width: 280px;
+    height: 280px;
+    background: radial-gradient(circle, rgba(155, 108, 227, 0.35) 0%, transparent 65%);
+    pointer-events: none;
+    animation: floatGlow 8s ease-in-out infinite;
+  }
+  .hos-display::after {
+    content: '';
+    position: absolute;
+    bottom: -100px;
+    left: -100px;
+    width: 240px;
+    height: 240px;
+    background: radial-gradient(circle, rgba(91, 143, 249, 0.25) 0%, transparent 65%);
+    pointer-events: none;
+    animation: floatGlow 10s ease-in-out infinite reverse;
+  }
+  @keyframes floatGlow {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(20px, -15px); }
+  }
+  .hos-content { position: relative; z-index: 1; }
+  .hos-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.32em;
+    color: var(--text-tertiary);
+    margin-bottom: 4px;
+    text-transform: uppercase;
+  }
+  .hos-score {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 88px;
+    line-height: 1;
+    background: linear-gradient(135deg, #FFFFFF 0%, var(--brand-blue-light) 40%, var(--brand-blue) 70%, var(--brand-purple) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.03em;
+    margin: 4px 0;
+  }
+  .hos-max {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-faint);
+    letter-spacing: 0.12em;
+    margin-bottom: 14px;
+  }
+  .hos-state {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 500;
+    font-size: 18px;
+    letter-spacing: 0.04em;
+    color: var(--text-primary);
+  }
+  .hos-recommendation {
+    font-size: 12px;
+    color: var(--brand-cyan);
+    margin-top: 8px;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+  }
+
+  /* Trend mini-graph */
+  .hos-trend {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-subtle);
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 4px;
+    height: 36px;
+  }
+  .trend-bar {
+    flex: 1;
+    background: linear-gradient(180deg, var(--brand-cyan), var(--brand-purple));
+    border-radius: 2px 2px 0 0;
+    min-height: 2px;
+    transition: height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 0.85;
+  }
+  .trend-bar.empty { background: rgba(255,255,255,0.06); }
+  .trend-bar.today {
+    background: linear-gradient(180deg, var(--brand-pink), var(--brand-purple));
+    opacity: 1;
+    box-shadow: 0 0 8px rgba(232, 90, 171, 0.4);
+  }
+  .trend-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    color: var(--text-faint);
+    text-align: center;
+    margin-top: 6px;
+    letter-spacing: 0.08em;
+  }
+
+  /* ========================================
+     SECTIONS & CARDS
+     ======================================== */
+  .section { margin-bottom: 18px; }
+  .section-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.32em;
+    color: var(--brand-cyan);
+    margin-bottom: 12px;
+    padding-left: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .section-title-action {
+    color: var(--text-tertiary);
+    cursor: pointer;
+    font-size: 9px;
+    padding: 4px 10px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    border-radius: 100px;
+    letter-spacing: 0.15em;
+    transition: all 0.15s;
+  }
+  .section-title-action:active { background: var(--bg-card-hover); transform: scale(0.96); }
+
+  /* Auto data cards */
+  .auto-data-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .data-input-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    border-radius: var(--r-lg);
+    padding: 13px 14px;
+    transition: border-color 0.2s;
+  }
+  .data-input-card:focus-within {
+    border-color: var(--brand-blue);
+    box-shadow: 0 0 0 3px rgba(91, 143, 249, 0.1);
+  }
+  .data-input-label {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .data-input-jp {
+    font-size: 10px;
+    color: var(--text-faint);
+    margin: 1px 0 8px;
+  }
+  .data-input-field {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid var(--border-default);
+    border-radius: var(--r-sm);
+    color: var(--text-primary);
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 17px;
+    padding: 7px 10px;
+    text-align: center;
+    transition: all 0.15s;
+  }
+  .data-input-field:focus {
+    outline: none;
+    border-color: var(--brand-cyan);
+    background: rgba(0, 0, 0, 0.5);
+  }
+  .data-input-unit {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--text-faint);
+    text-align: center;
+    margin-top: 5px;
+    letter-spacing: 0.1em;
+  }
+  .auto-note {
+    font-size: 10px;
+    color: var(--text-faint);
+    text-align: center;
+    margin: 0 0 10px;
+    font-style: italic;
+  }
+
+  /* Sliders */
+  .slider-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    border-radius: var(--r-lg);
+    padding: 13px 16px 12px;
+    margin-bottom: 8px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .slider-card:focus-within {
+    border-color: var(--brand-purple);
+    box-shadow: 0 0 0 3px rgba(155, 108, 227, 0.1);
+  }
+  .slider-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 2px;
+  }
+  .slider-label-en {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-primary);
+  }
+  .slider-value {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    background: linear-gradient(135deg, var(--brand-cyan), var(--brand-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    transition: transform 0.15s;
+  }
+  .slider-value.bumping { animation: valueBump 0.3s ease; }
+  @keyframes valueBump {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.18); }
+  }
+  .slider-label-jp {
+    font-size: 10px;
+    color: var(--text-tertiary);
+    margin-bottom: 10px;
+  }
+  .slider-track-wrapper {
+    position: relative;
+    height: 28px;
+    display: flex;
+    align-items: center;
+  }
+  .slider-input {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 3px;
+    outline: none;
+    cursor: pointer;
+  }
+  .slider-input::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 24px;
+    height: 24px;
+    background: linear-gradient(135deg, var(--brand-cyan), var(--brand-purple));
+    border: 2.5px solid white;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(91, 143, 249, 0.5), inset 0 1px 2px rgba(255,255,255,0.3);
+    transition: transform 0.1s;
+  }
+  .slider-input:active::-webkit-slider-thumb {
+    transform: scale(1.2);
+    box-shadow: 0 6px 20px rgba(155, 108, 227, 0.6);
+  }
+  .slider-input::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+    background: linear-gradient(135deg, var(--brand-cyan), var(--brand-purple));
+    border: 2.5px solid white;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(91, 143, 249, 0.5);
+  }
+  .slider-scale {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--text-faint);
+    margin-top: 5px;
+    padding: 0 4px;
+    letter-spacing: 0.05em;
+  }
+
+  /* Note input */
+  .note-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    border-radius: var(--r-lg);
+    padding: 13px 16px;
+    margin-top: 10px;
+  }
+  .note-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 13px;
+    resize: none;
+    min-height: 44px;
+    line-height: 1.6;
+  }
+  .note-input:focus { outline: none; }
+  .note-input::placeholder { color: var(--text-faint); }
+  .note-counter {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--text-faint);
+    text-align: right;
+    margin-top: 4px;
+  }
+
+  /* ========================================
+     BUTTONS
+     ======================================== */
+  .compute-btn {
+    width: 100%;
+    background: linear-gradient(135deg, var(--brand-purple) 0%, var(--brand-blue) 50%, var(--brand-cyan) 100%);
+    background-size: 200% 200%;
+    color: white;
+    border: none;
+    border-radius: var(--r-lg);
+    padding: 16px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.22em;
+    cursor: pointer;
+    margin-top: 12px;
+    box-shadow: var(--shadow-glow-purple);
+    transition: all 0.2s;
+    text-transform: uppercase;
+    animation: gradientShift 6s ease infinite;
+  }
+  @keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+  .compute-btn:active {
+    transform: scale(0.98);
+    box-shadow: 0 4px 16px rgba(155, 108, 227, 0.4);
+  }
+  .compute-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .secondary-btn {
+    width: 100%;
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid var(--border-default);
+    border-radius: var(--r-md);
+    padding: 13px;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-weight: 500;
+    font-size: 13px;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: all 0.15s;
+  }
+  .secondary-btn:active {
+    background: var(--bg-card-hover);
+    transform: scale(0.99);
+  }
+  .danger-btn {
+    background: rgba(255, 94, 108, 0.12);
+    color: var(--brand-red);
+    border: 1px solid rgba(255, 94, 108, 0.3);
+  }
+
+  /* ========================================
+     INDICATOR BREAKDOWN
+     ======================================== */
+  .indicator-breakdown {
+    margin-top: 14px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    border-radius: var(--r-lg);
+    padding: 16px 18px;
+    display: none;
+  }
+  .indicator-breakdown.visible {
+    display: block;
+    animation: fadeSlideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .breakdown-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .breakdown-row:last-child { margin-bottom: 0; }
+  .breakdown-label {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    width: 72px;
+    color: var(--text-secondary);
+    font-weight: 600;
+  }
+  .breakdown-bar-bg {
+    flex-grow: 1;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 3px;
+    overflow: hidden;
+    margin: 0 12px;
+    position: relative;
+  }
+  .breakdown-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--brand-purple), var(--brand-blue), var(--brand-cyan));
+    border-radius: 3px;
+    transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 8px rgba(91, 143, 249, 0.4);
+  }
+  .breakdown-score {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    width: 28px;
+    text-align: right;
+    font-weight: 600;
+  }
+
+  /* ========================================
+     HISTORY TAB
+     ======================================== */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .stat-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    border-radius: var(--r-md);
+    padding: 12px 8px;
+    text-align: center;
+  }
+  .stat-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    color: var(--text-faint);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .stat-value {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 22px;
+    background: linear-gradient(135deg, var(--brand-cyan), var(--brand-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .stat-sub {
+    font-size: 9px;
+    color: var(--text-faint);
+    margin-top: 2px;
+  }
+
+  /* History rows */
+  .history-row {
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    border-radius: var(--r-md);
+    padding: 14px 16px;
+    margin-bottom: 7px;
+    transition: all 0.2s;
+  }
+  .history-row.expanded {
+    background: var(--bg-card-hover);
+    border-color: var(--brand-purple);
+    box-shadow: 0 4px 16px rgba(155, 108, 227, 0.15);
+  }
+  .history-row-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    gap: 12px;
+  }
+  .history-meta { flex: 1; min-width: 0; }
+  .history-date {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text-secondary);
+    font-size: 11px;
+    letter-spacing: 0.05em;
+  }
+  .history-state {
+    font-size: 10px;
+    color: var(--brand-cyan);
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.12em;
+    margin-top: 2px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .history-note-preview {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    margin-top: 3px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 200px;
+  }
+  .history-score {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 22px;
+    background: linear-gradient(135deg, var(--brand-cyan), var(--brand-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    flex-shrink: 0;
+  }
+  .history-actions {
+    display: none;
+    gap: 8px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border-subtle);
+  }
+  .history-row.expanded .history-actions { display: flex; }
+  .history-action-btn {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid var(--border-default);
+    border-radius: var(--r-sm);
+    background: transparent;
+    color: var(--text-primary);
+    font-size: 12px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .history-action-btn:active { background: var(--bg-card-hover); }
+  .history-action-btn.delete {
+    color: var(--brand-red);
+    border-color: rgba(255, 94, 108, 0.3);
+  }
+
+  /* ========================================
+     GROUP CARDS
+     ======================================== */
+  .group-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    border-radius: var(--r-lg);
+    padding: 16px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .group-card:active { transform: scale(0.99); }
+  .group-card.active {
+    border-color: var(--brand-cyan);
+    background: linear-gradient(165deg, rgba(0, 212, 255, 0.05) 0%, rgba(155, 108, 227, 0.05) 100%);
+    box-shadow: var(--shadow-glow);
+  }
+  .group-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .group-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: 0.02em;
+  }
+  .group-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--text-faint);
+    letter-spacing: 0.12em;
+    padding: 3px 8px;
+    border: 1px solid var(--border-default);
+    border-radius: 100px;
+    text-transform: uppercase;
+  }
+  .group-stats {
+    display: flex;
+    gap: 16px;
+    margin-top: 8px;
+    font-size: 11px;
+    color: var(--text-tertiary);
+  }
+  .group-stat-value {
+    color: var(--brand-cyan);
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    margin-left: 4px;
+  }
+
+  /* Member list */
+  .member-row {
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    border-radius: var(--r-md);
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 6px;
+    transition: all 0.15s;
+  }
+  .member-row.recorded-today { border-color: rgba(6, 214, 160, 0.3); }
+  .member-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--brand-purple), var(--brand-blue));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    margin-right: 12px;
+    color: white;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(155, 108, 227, 0.3);
+  }
+  .member-info { flex-grow: 1; min-width: 0; }
+  .member-name {
+    font-size: 13px;
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .member-date {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--text-faint);
+    margin-top: 2px;
+    letter-spacing: 0.05em;
+  }
+  .member-recorded-dot {
+    color: var(--brand-mint);
+  }
+  .member-score {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+  }
+  .member-state {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--brand-cyan);
+    margin-top: 2px;
+    text-align: right;
+    letter-spacing: 0.05em;
+  }
+
+  /* ========================================
+     MODALS
+     ======================================== */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(5, 7, 21, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 20px;
+  }
+  .modal-backdrop.visible {
+    display: flex;
+    animation: fadeIn 0.25s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .modal {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r-xl);
+    padding: 24px;
+    max-width: 400px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-lg);
+    animation: modalSlide 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  @keyframes modalSlide {
+    from { transform: translateY(20px) scale(0.96); opacity: 0; }
+    to { transform: translateY(0) scale(1); opacity: 1; }
+  }
+  .modal-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 17px;
+    letter-spacing: 0.05em;
+    margin-bottom: 16px;
+  }
+  .modal-input {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid var(--border-default);
+    border-radius: var(--r-md);
+    padding: 12px;
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 14px;
+    margin-bottom: 12px;
+    transition: border-color 0.15s;
+  }
+  .modal-input:focus {
+    outline: none;
+    border-color: var(--brand-cyan);
+  }
+  .modal-options { margin-bottom: 16px; }
+  .radio-option {
+    display: flex;
+    align-items: flex-start;
+    padding: 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    border-radius: var(--r-md);
+    margin-bottom: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .radio-option:has(input:checked) {
+    border-color: var(--brand-purple);
+    background: rgba(155, 108, 227, 0.08);
+  }
+  .radio-option input { margin-right: 12px; margin-top: 3px; accent-color: var(--brand-purple); }
+  .radio-option-text {
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .radio-option-sub {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    margin-top: 2px;
+  }
+  .modal-actions { display: flex; gap: 8px; }
+  .modal-actions button { flex: 1; }
+
+  /* Invite buttons */
+  .invite-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin-top: 16px;
+  }
+  .invite-btn {
+    padding: 16px 8px;
+    border: 1px solid var(--border-default);
+    border-radius: var(--r-md);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    font-size: 11px;
+    font-family: inherit;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: center;
+    line-height: 1.4;
+    transition: all 0.15s;
+  }
+  .invite-btn:active {
+    background: rgba(91, 143, 249, 0.1);
+    border-color: var(--brand-blue);
+    transform: scale(0.97);
+  }
+  .invite-btn-icon { font-size: 22px; display: block; margin-bottom: 4px; }
+  .invite-link-display {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--border-default);
+    border-radius: var(--r-sm);
+    padding: 10px 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-tertiary);
+    margin-top: 12px;
+    word-break: break-all;
+    line-height: 1.6;
+  }
+  .invite-code-display {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 36px;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--brand-cyan), var(--brand-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-top: 4px;
+    letter-spacing: 0.12em;
+    text-align: center;
+    padding: 8px 0;
+  }
+
+  /* ========================================
+     EMPTY STATES & MESSAGES
+     ======================================== */
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-faint);
+    font-size: 13px;
+    line-height: 1.7;
+  }
+  .empty-state-icon {
+    font-size: 36px;
+    margin-bottom: 10px;
+    opacity: 0.4;
+  }
+  .empty-state-sub {
+    font-size: 11px;
+    color: var(--text-faint);
+    margin-top: 8px;
+  }
+
+  .status-message {
+    background: var(--bg-card);
+    border-left: 3px solid var(--brand-cyan);
+    padding: 11px 14px;
+    border-radius: var(--r-sm);
+    font-size: 12px;
+    margin-bottom: 12px;
+    color: var(--text-secondary);
+    animation: fadeSlideIn 0.3s ease;
+  }
+  .status-message.error { border-left-color: var(--brand-red); }
+  .status-message.success { border-left-color: var(--brand-mint); }
+
+  /* Footer */
+  .footer {
+    margin-top: 36px;
+    padding: 20px 0;
+    text-align: center;
+    border-top: 1px solid var(--border-subtle);
+  }
+  .footer .logo-text-main { font-size: 11px; }
+  .footer .logo-text-sub { font-size: 8px; margin-top: 4px; }
+  .footer-meta {
+    margin-top: 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--text-faint);
+    letter-spacing: 0.15em;
+  }
+  .footer-link {
+    display: inline-block;
+    margin-top: 10px;
+    color: var(--text-tertiary);
+    font-size: 11px;
+    text-decoration: none;
+    cursor: pointer;
+    padding: 6px 14px;
+    border: 1px solid var(--border-default);
+    border-radius: 100px;
+    transition: all 0.15s;
+  }
+  .footer-link:active { background: var(--bg-card); }
+
+  /* ========================================
+     LOADING & ANIMATIONS
+     ======================================== */
+  .loading-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(5, 7, 21, 0.85);
+    backdrop-filter: blur(6px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+  }
+  .loading-overlay.visible { display: flex; }
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(255,255,255,0.08);
+    border-top-color: var(--brand-cyan);
+    border-right-color: var(--brand-purple);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Celebration */
+  .celebration {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 300;
+    display: none;
+  }
+  .celebration.active { display: block; }
+  .celebration-message {
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    background: linear-gradient(135deg, var(--brand-purple), var(--brand-blue));
+    color: white;
+    padding: 24px 32px;
+    border-radius: var(--r-xl);
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+    animation: celebrate 2.5s ease forwards;
+  }
+  @keyframes celebrate {
+    0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+    20% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+    30% { transform: translate(-50%, -50%) scale(1); }
+    80% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(0.9); opacity: 0; }
+  }
+  .celebration-emoji { font-size: 48px; display: block; margin-bottom: 8px; }
+  .celebration-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    margin-bottom: 4px;
+  }
+  .celebration-sub { font-size: 12px; opacity: 0.9; }
+
+  /* ========================================
+     ONBOARDING SCREEN (NEW in v20)
+     ======================================== */
+  .onboarding-screen { display: none; padding: 20px 16px 40px; min-height: 100vh; }
+  .onboarding-screen.active { display: block; animation: fadeSlideIn 0.4s; }
+  .onboarding-progress { display: flex; gap: 6px; margin-bottom: 24px; }
+  .progress-dot { flex: 1; height: 3px; background: rgba(255,255,255,0.1); border-radius: 2px; transition: background 0.3s; }
+  .progress-dot.active { background: linear-gradient(90deg, var(--brand-cyan), var(--brand-purple)); }
+  .progress-dot.completed { background: var(--brand-cyan); }
+  .onboarding-step { display: none; }
+  .onboarding-step.active { display: block; animation: fadeSlideIn 0.4s; }
+  .onboarding-title { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 24px; margin-bottom: 8px; line-height: 1.3; }
+  .onboarding-subtitle { font-size: 13px; color: var(--text-tertiary); margin-bottom: 28px; line-height: 1.7; }
+  .form-group { margin-bottom: 20px; }
+  .form-label { display: block; font-size: 11px; color: var(--text-secondary); margin-bottom: 8px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; }
+  .form-input, .form-select { width: 100%; background: var(--bg-card); border: 1px solid var(--border-default); border-radius: var(--r-md); padding: 14px 16px; color: var(--text-primary); font-family: inherit; font-size: 15px; transition: all 0.15s; }
+  .form-input:focus, .form-select:focus { outline: none; border-color: var(--brand-purple); background: var(--bg-card-hover); box-shadow: 0 0 0 3px rgba(155, 108, 227, 0.1); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .form-row.three { grid-template-columns: 1fr 1fr 1fr; }
+  .option-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .option-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+  .option-btn { padding: 14px 12px; background: var(--bg-card); border: 1px solid var(--border-default); border-radius: var(--r-md); color: var(--text-primary); font-family: inherit; font-size: 13px; cursor: pointer; text-align: center; transition: all 0.15s; line-height: 1.4; }
+  .option-btn.selected { border-color: var(--brand-purple); background: rgba(155, 108, 227, 0.12); box-shadow: 0 0 0 3px rgba(155, 108, 227, 0.1); }
+  .option-btn-emoji { font-size: 22px; display: block; margin-bottom: 4px; }
+  .option-btn-sub { font-size: 10px; color: var(--text-faint); margin-top: 2px; }
+  .onboarding-actions { display: flex; gap: 8px; margin-top: 32px; }
+  .onboarding-actions button { flex: 1; }
+  .onboarding-actions .compute-btn { flex: 2; }
+
+  /* PROFILE TAB (NEW in v20) */
+  .profile-card { background: var(--bg-card); border: 1px solid var(--border-default); border-radius: var(--r-lg); padding: 16px; margin-bottom: 12px; }
+  .profile-card-title { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.32em; color: var(--brand-cyan); margin-bottom: 12px; text-transform: uppercase; font-weight: 500; }
+  .profile-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border-subtle); font-size: 13px; }
+  .profile-row:last-child { border-bottom: none; }
+  .profile-row-label { color: var(--text-tertiary); }
+  .profile-row-value { font-weight: 500; color: var(--text-primary); font-family: 'Space Grotesk', sans-serif; }
+
+  /* ========================================
+     FLOW SESSION (NEW in v21)
+     ======================================== */
+  .flow-session-card {
+    background: linear-gradient(165deg, rgba(232, 90, 171, 0.08) 0%, rgba(155, 108, 227, 0.06) 50%, rgba(0, 212, 255, 0.04) 100%);
+    border: 1px solid rgba(232, 90, 171, 0.18);
+    border-radius: var(--r-2xl);
+    padding: 24px 20px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .flow-session-card::before {
+    content: '';
+    position: absolute;
+    top: -100px; right: -100px;
+    width: 240px; height: 240px;
+    background: radial-gradient(circle, rgba(232, 90, 171, 0.18) 0%, transparent 65%);
+    pointer-events: none;
+  }
+  .flow-session-content { position: relative; z-index: 1; }
+  .flow-session-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .flow-session-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.32em;
+    color: var(--brand-pink);
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .flow-session-status {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    color: var(--text-faint);
+    padding: 3px 10px;
+    border: 1px solid var(--border-default);
+    border-radius: 100px;
+    text-transform: uppercase;
+  }
+  .flow-session-status.active {
+    color: var(--brand-pink);
+    border-color: rgba(232, 90, 171, 0.4);
+    background: rgba(232, 90, 171, 0.1);
+    animation: pulseDot 2s ease-in-out infinite;
+  }
+  @keyframes pulseDot { 0%, 100% { box-shadow: 0 0 0 0 rgba(232, 90, 171, 0.4); } 50% { box-shadow: 0 0 0 8px rgba(232, 90, 171, 0); } }
+  .flow-session-title { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 16px; margin-bottom: 4px; }
+  .flow-session-sub { font-size: 11px; color: var(--text-tertiary); margin-bottom: 16px; line-height: 1.6; }
+
+  .flow-timer-display {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 56px;
+    line-height: 1;
+    background: linear-gradient(135deg, var(--brand-pink), var(--brand-purple), var(--brand-cyan));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-align: center;
+    letter-spacing: -0.02em;
+    margin: 12px 0;
+    font-variant-numeric: tabular-nums;
+  }
+  .flow-timer-task {
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-tertiary);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .flow-start-btn {
+    width: 100%;
+    background: linear-gradient(135deg, var(--brand-pink) 0%, var(--brand-purple) 50%, var(--brand-cyan) 100%);
+    color: white;
+    border: none;
+    border-radius: var(--r-lg);
+    padding: 14px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.22em;
+    cursor: pointer;
+    text-transform: uppercase;
+    box-shadow: 0 8px 24px rgba(232, 90, 171, 0.3);
+  }
+  .flow-start-btn:active { transform: scale(0.98); }
+  .flow-end-btn {
+    background: linear-gradient(135deg, var(--brand-red) 0%, var(--brand-purple) 100%);
+    box-shadow: 0 8px 24px rgba(255, 94, 108, 0.3);
+  }
+
+  .flow-session-row { display: flex; gap: 8px; }
+  .flow-session-row > * { flex: 1; }
+
+  /* Task type selector */
+  .task-type-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .task-type-btn {
+    padding: 14px 10px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    border-radius: var(--r-md);
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 12px;
+    cursor: pointer;
+    text-align: center;
+    line-height: 1.4;
+  }
+  .task-type-btn.selected {
+    border-color: var(--brand-pink);
+    background: rgba(232, 90, 171, 0.1);
+    box-shadow: 0 0 0 3px rgba(232, 90, 171, 0.1);
+  }
+  .task-type-emoji { font-size: 22px; display: block; margin-bottom: 4px; }
+  .task-type-sub { font-size: 9px; color: var(--text-faint); margin-top: 2px; }
+
+  /* Athlete-specific fields */
+  .session-context-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .context-btn {
+    padding: 10px 4px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    border-radius: var(--r-sm);
+    color: var(--text-secondary);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .context-btn.selected {
+    border-color: var(--brand-cyan);
+    background: rgba(0, 212, 255, 0.1);
+    color: var(--brand-cyan);
+  }
+
+  /* True Zone badge */
+  .true-zone-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.18), rgba(232, 90, 171, 0.15));
+    border: 1px solid rgba(255, 215, 0, 0.35);
+    border-radius: 100px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    color: var(--brand-gold);
+    text-transform: uppercase;
+  }
+
+  /* Flow tab specific */
+  .flow-stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
+  .flow-session-history {
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    border-radius: var(--r-md);
+    padding: 14px 16px;
+    margin-bottom: 7px;
+    cursor: pointer;
+  }
+  .flow-history-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+  }
+  .flow-history-task {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+  }
+  .flow-history-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--text-faint);
+    letter-spacing: 0.08em;
+    margin-top: 3px;
+  }
+  .flow-history-scores {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+  }
+  .flow-score-block {
+    flex: 1;
+    text-align: center;
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: var(--r-sm);
+  }
+  .flow-score-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    color: var(--text-faint);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .flow-score-value {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+  }
+  .flow-score-value.subjective { color: var(--brand-pink); }
+  .flow-score-value.performance { color: var(--brand-cyan); }
+  .flow-score-value.duration { color: var(--brand-purple); }
+
+  .flow-modal-step { display: none; }
+  .flow-modal-step.active { display: block; animation: fadeSlideIn 0.3s; }
+
+  /* Slider for modals */
+  .modal-slider-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    border-radius: var(--r-md);
+    padding: 12px 14px;
+    margin-bottom: 10px;
+  }
+  .modal-slider-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 6px;
+  }
+  .modal-slider-label {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+  }
+  .modal-slider-value {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    background: linear-gradient(135deg, var(--brand-cyan), var(--brand-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .modal-slider-jp { font-size: 10px; color: var(--text-faint); margin-bottom: 8px; }
+
+  /* ========================================
+     COHORT FEATURE (NEW in v22)
+     ======================================== */
+  .cohort-card {
+    background: linear-gradient(165deg, rgba(0, 212, 255, 0.06) 0%, rgba(155, 108, 227, 0.05) 100%);
+    border: 1px solid var(--border-default);
+    border-radius: var(--r-lg);
+    padding: 16px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .cohort-card:active { transform: scale(0.99); }
+  .cohort-card.active {
+    border-color: var(--brand-cyan);
+    box-shadow: 0 0 0 1px var(--brand-cyan), var(--shadow-glow);
+  }
+  .cohort-card.event {
+    background: linear-gradient(165deg, rgba(232, 90, 171, 0.08) 0%, rgba(155, 108, 227, 0.06) 100%);
+    border-color: rgba(232, 90, 171, 0.2);
+  }
+  .cohort-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+    gap: 8px;
+  }
+  .cohort-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    line-height: 1.4;
+  }
+  .cohort-type-badge {
+    flex-shrink: 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    color: var(--text-tertiary);
+    letter-spacing: 0.18em;
+    padding: 3px 8px;
+    border: 1px solid var(--border-default);
+    border-radius: 100px;
+    text-transform: uppercase;
+  }
+  .cohort-type-badge.event {
+    color: var(--brand-pink);
+    border-color: rgba(232, 90, 171, 0.3);
+    background: rgba(232, 90, 171, 0.08);
+  }
+  .cohort-type-badge.longterm {
+    color: var(--brand-cyan);
+    border-color: rgba(0, 212, 255, 0.3);
+    background: rgba(0, 212, 255, 0.08);
+  }
+  .cohort-meta-row {
+    display: flex;
+    gap: 12px;
+    font-size: 10px;
+    color: var(--text-tertiary);
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.05em;
+    margin-top: 6px;
+  }
+  .cohort-meta-row span { display: inline-flex; align-items: center; gap: 4px; }
+  .cohort-meta-row strong {
+    color: var(--brand-cyan);
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+  }
+  .cohort-period {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border-subtle);
+    font-size: 11px;
+    color: var(--text-tertiary);
+  }
+  .cohort-status-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    margin-right: 6px;
+    background: var(--brand-mint);
+    box-shadow: 0 0 8px rgba(6, 214, 160, 0.5);
+  }
+  .cohort-status-dot.upcoming { background: var(--brand-gold); box-shadow: 0 0 8px rgba(255, 215, 0, 0.5); }
+  .cohort-status-dot.ended { background: var(--text-faint); box-shadow: none; }
+
+  /* Leaderboard */
+  .leaderboard {
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    border-radius: var(--r-lg);
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+  .leaderboard-row {
+    display: flex;
+    align-items: center;
+    padding: 10px 8px;
+    border-bottom: 1px solid var(--border-subtle);
+    cursor: pointer;
+    border-radius: var(--r-sm);
+    transition: background 0.15s;
+  }
+  .leaderboard-row:hover { background: rgba(255, 255, 255, 0.02); }
+  .leaderboard-row:last-child { border-bottom: none; }
+  .leaderboard-row.you {
+    background: linear-gradient(90deg, rgba(0, 212, 255, 0.08), transparent);
+    border-left: 3px solid var(--brand-cyan);
+  }
+  .leaderboard-rank {
+    width: 28px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 12px;
+    color: var(--text-tertiary);
+    text-align: center;
+  }
+  .leaderboard-rank.top1 { color: var(--brand-gold); }
+  .leaderboard-rank.top2 { color: rgba(255, 255, 255, 0.7); }
+  .leaderboard-rank.top3 { color: #cd7f32; }
+  .leaderboard-name {
+    flex: 1;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 500;
+    font-size: 13px;
+    margin-left: 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .leaderboard-anon-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    color: var(--text-faint);
+    letter-spacing: 0.15em;
+    padding: 2px 6px;
+    border: 1px solid var(--border-default);
+    border-radius: 100px;
+    margin-left: 6px;
+  }
+  .leaderboard-score {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    background: linear-gradient(135deg, var(--brand-cyan), var(--brand-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-right: 8px;
+    flex-shrink: 0;
+  }
+  .leaderboard-trend {
+    font-size: 10px;
+    width: 32px;
+    text-align: right;
+    font-family: 'JetBrains Mono', monospace;
+    flex-shrink: 0;
+  }
+  .leaderboard-trend.up { color: var(--brand-mint); }
+  .leaderboard-trend.down { color: var(--brand-red); }
+  .leaderboard-trend.flat { color: var(--text-faint); }
+  .leaderboard-empty {
+    text-align: center;
+    color: var(--text-faint);
+    font-size: 11px;
+    padding: 16px;
+  }
+
+  /* Cohort Insights Card */
+  .cohort-insights {
+    background: linear-gradient(135deg, rgba(155, 108, 227, 0.06), rgba(0, 212, 255, 0.04));
+    border: 1px solid var(--border-default);
+    border-radius: var(--r-lg);
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  .cohort-insight-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    font-size: 12px;
+  }
+  .cohort-insight-label { color: var(--text-tertiary); }
+  .cohort-insight-value {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    color: var(--brand-cyan);
+  }
+
+  /* Member Detail Modal */
+  .member-detail-section { margin-bottom: 16px; }
+  .member-detail-section:last-child { margin-bottom: 0; }
+  .member-stat-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border-subtle);
+    font-size: 12px;
+  }
+  .member-stat-row:last-child { border-bottom: none; }
+  .member-stat-label { color: var(--text-tertiary); }
+  .member-stat-value {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-family: 'Space Grotesk', sans-serif;
+  }
+  .member-trend-bars {
+    display: flex;
+    gap: 3px;
+    align-items: flex-end;
+    height: 32px;
+    margin: 8px 0;
+  }
+  .member-trend-bar {
+    flex: 1;
+    background: linear-gradient(180deg, var(--brand-cyan), var(--brand-purple));
+    border-radius: 2px;
+    min-height: 2px;
+  }
+  .member-trend-bar.empty { background: rgba(255, 255, 255, 0.05); }
+  .member-data-restricted {
+    text-align: center;
+    color: var(--text-faint);
+    font-size: 11px;
+    padding: 16px 0;
+    font-style: italic;
+  }
+
+  /* Sharing settings */
+  .sharing-options {
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    border-radius: var(--r-md);
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+  .sharing-option {
+    display: flex;
+    align-items: flex-start;
+    padding: 10px;
+    border-radius: var(--r-sm);
+    cursor: pointer;
+    border: 1px solid transparent;
+    margin-bottom: 4px;
+  }
+  .sharing-option:hover { background: rgba(255, 255, 255, 0.02); }
+  .sharing-option.selected {
+    border-color: var(--brand-purple);
+    background: rgba(155, 108, 227, 0.08);
+  }
+  .sharing-option input { margin-right: 12px; margin-top: 2px; accent-color: var(--brand-purple); }
+  .sharing-option-content { flex: 1; }
+  .sharing-option-title {
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+  .sharing-option-sub {
+    font-size: 10px;
+    color: var(--text-tertiary);
+    line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+
+<!-- Reusable SVG logo (defined once, used many times) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8AB4FB"/>
+      <stop offset="40%" stop-color="#5B8FF9"/>
+      <stop offset="100%" stop-color="#9B6CE3"/>
+    </linearGradient>
+    <linearGradient id="logoGradientLight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#A9C5FC"/>
+      <stop offset="50%" stop-color="#7FA5FA"/>
+      <stop offset="100%" stop-color="#B58CEC"/>
+    </linearGradient>
+    <filter id="logoGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feFlood flood-color="#9B6CE3" flood-opacity="0.4"/>
+      <feComposite in2="blur" operator="in"/>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <symbol id="neusenMark" viewBox="0 0 100 100">
+      <!-- Stylized "N" ribbon mark inspired by uploaded logo -->
+      <path d="M 22 22 
+               L 22 78 
+               C 22 80, 24 82, 26 82
+               L 32 82
+               C 34 82, 36 80, 36 78
+               L 36 44
+               L 64 76
+               C 65 77, 66 78, 67 78
+               L 72 78
+               C 74 78, 76 76, 76 74
+               L 76 22
+               C 76 20, 74 18, 72 18
+               L 67 18
+               C 65 18, 64 19, 64 21
+               L 64 56
+               L 36 22
+               C 35 21, 34 20, 33 20
+               L 26 20
+               C 24 20, 22 21, 22 22 Z"
+            fill="url(#logoGradient)"
+            filter="url(#logoGlow)"/>
+      <!-- Highlight strokes for ribbon effect -->
+      <path d="M 24 24 L 24 76" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      <path d="M 74 24 L 74 76" stroke="rgba(255,255,255,0.15)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    </symbol>
+  </defs>
+</svg>
+
+<!-- ========================================
+     CONTAINER
+     ======================================== -->
+<div class="container">
+
+  <!-- LOGIN SCREEN -->
+  <div id="loginScreen" class="login-screen">
+    <svg class="logo-mark" width="80" height="80" aria-label="NEUSEN">
+      <use href="#neusenMark"/>
+    </svg>
+    <div class="login-text-block logo-text-block" style="align-items: center;">
+      <div class="logo-text-main">NEUSEN</div>
+      <div class="logo-text-sub">Human Operating System</div>
+    </div>
+    <div class="login-tagline">
+      <strong>判断品質を可視化する。</strong><br>
+      AI時代の人間OSを、<br>あなた自身の手で再設計。
+    </div>
+    <button class="google-signin-btn" id="googleSigninBtn">
+      <svg class="google-icon" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Googleでログイン
+    </button>
+    <div class="login-note">
+      Googleアカウントでログイン後、<br>
+      あなたのHOSデータがクラウドに安全に保存されます。
+    </div>
+  </div>
+
+  <!-- ONBOARDING SCREEN (NEW in v20) -->
+  <div id="onboardingScreen" class="onboarding-screen">
+    <div class="onboarding-progress">
+      <div class="progress-dot active"></div>
+      <div class="progress-dot"></div>
+      <div class="progress-dot"></div>
+      <div class="progress-dot"></div>
+      <div class="progress-dot"></div>
+    </div>
+
+    <div class="onboarding-step active" data-step="1">
+      <div class="onboarding-title">あなたについて教えてください</div>
+      <div class="onboarding-subtitle">年齢や性別はHOSスコアの精度を高めるために使われます。データは厳重に保護されます。</div>
+      <div class="form-group">
+        <label class="form-label">生年月日</label>
+        <div class="form-row three">
+          <input type="number" class="form-input" id="profileBirthYear" placeholder="年" min="1920" max="2020">
+          <input type="number" class="form-input" id="profileBirthMonth" placeholder="月" min="1" max="12">
+          <input type="number" class="form-input" id="profileBirthDay" placeholder="日" min="1" max="31">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">性別</label>
+        <div class="option-grid three">
+          <button type="button" class="option-btn" data-field="sex" data-value="male">男性</button>
+          <button type="button" class="option-btn" data-field="sex" data-value="female">女性</button>
+          <button type="button" class="option-btn" data-field="sex" data-value="other">その他</button>
+        </div>
+      </div>
+      <div class="onboarding-actions">
+        <button class="compute-btn" onclick="onboardNext(1)">次へ</button>
+      </div>
+    </div>
+
+    <div class="onboarding-step" data-step="2">
+      <div class="onboarding-title">身体の基本情報</div>
+      <div class="onboarding-subtitle">身長と体重はBMI算出と健康指標の基準として使います。</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">身長 (cm)</label>
+          <input type="number" class="form-input" id="profileHeight" placeholder="170" min="100" max="250" step="0.1">
+        </div>
+        <div class="form-group">
+          <label class="form-label">体重 (kg)</label>
+          <input type="number" class="form-input" id="profileWeight" placeholder="65" min="20" max="200" step="0.1">
+        </div>
+      </div>
+      <div class="onboarding-actions">
+        <button class="secondary-btn" onclick="onboardBack(2)">戻る</button>
+        <button class="compute-btn" onclick="onboardNext(2)">次へ</button>
+      </div>
+    </div>
+
+    <div class="onboarding-step" data-step="3">
+      <div class="onboarding-title">ライフスタイル</div>
+      <div class="onboarding-subtitle">職業タイプとクロノタイプによって判断疲労のパターンが異なります。</div>
+      <div class="form-group">
+        <label class="form-label">職業タイプ</label>
+        <div class="option-grid">
+          <button type="button" class="option-btn" data-field="occupation" data-value="executive"><span class="option-btn-emoji">💼</span>経営者・幹部<div class="option-btn-sub">判断密度が高い</div></button>
+          <button type="button" class="option-btn" data-field="occupation" data-value="desk"><span class="option-btn-emoji">💻</span>デスクワーク<div class="option-btn-sub">座位中心</div></button>
+          <button type="button" class="option-btn" data-field="occupation" data-value="athlete"><span class="option-btn-emoji">🏃</span>アスリート<div class="option-btn-sub">高い身体負荷</div></button>
+          <button type="button" class="option-btn" data-field="occupation" data-value="creative"><span class="option-btn-emoji">🎨</span>クリエイター<div class="option-btn-sub">不規則な集中</div></button>
+          <button type="button" class="option-btn" data-field="occupation" data-value="shift"><span class="option-btn-emoji">🌙</span>シフト勤務<div class="option-btn-sub">不規則な睡眠</div></button>
+          <button type="button" class="option-btn" data-field="occupation" data-value="other"><span class="option-btn-emoji">🔄</span>その他<div class="option-btn-sub">混合・他</div></button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">クロノタイプ(朝型・夜型)</label>
+        <div class="option-grid three">
+          <button type="button" class="option-btn" data-field="chronotype" data-value="morning"><span class="option-btn-emoji">🌅</span>朝型</button>
+          <button type="button" class="option-btn" data-field="chronotype" data-value="middle"><span class="option-btn-emoji">☀️</span>中間</button>
+          <button type="button" class="option-btn" data-field="chronotype" data-value="evening"><span class="option-btn-emoji">🌙</span>夜型</button>
+        </div>
+      </div>
+      <div class="onboarding-actions">
+        <button class="secondary-btn" onclick="onboardBack(3)">戻る</button>
+        <button class="compute-btn" onclick="onboardNext(3)">次へ</button>
+      </div>
+    </div>
+
+    <div class="onboarding-step" data-step="4">
+      <div class="onboarding-title">日々の習慣</div>
+      <div class="onboarding-subtitle">運動・睡眠・食事のパターンを教えてください。</div>
+      <div class="form-group">
+        <label class="form-label">運動頻度</label>
+        <div class="option-grid">
+          <button type="button" class="option-btn" data-field="exercise" data-value="none">ほぼしない</button>
+          <button type="button" class="option-btn" data-field="exercise" data-value="light">週1-2回</button>
+          <button type="button" class="option-btn" data-field="exercise" data-value="moderate">週3-4回</button>
+          <button type="button" class="option-btn" data-field="exercise" data-value="intense">週5回以上</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">理想の睡眠時間 (時間)</label>
+        <input type="number" class="form-input" id="profileSleepGoal" placeholder="7.5" min="4" max="12" step="0.5">
+      </div>
+      <div class="form-group">
+        <label class="form-label">食生活タイプ</label>
+        <div class="option-grid">
+          <button type="button" class="option-btn" data-field="diet" data-value="standard">標準</button>
+          <button type="button" class="option-btn" data-field="diet" data-value="lowcarb">低糖質</button>
+          <button type="button" class="option-btn" data-field="diet" data-value="fasting">断食実践</button>
+          <button type="button" class="option-btn" data-field="diet" data-value="vegetarian">ベジタリアン</button>
+        </div>
+      </div>
+      <div class="onboarding-actions">
+        <button class="secondary-btn" onclick="onboardBack(4)">戻る</button>
+        <button class="compute-btn" onclick="onboardNext(4)">次へ</button>
+      </div>
+    </div>
+
+    <div class="onboarding-step" data-step="5">
+      <div class="onboarding-title">嗜好品</div>
+      <div class="onboarding-subtitle">カフェイン・アルコールの摂取量。判断品質に影響します。</div>
+      <div class="form-group">
+        <label class="form-label">カフェイン摂取量</label>
+        <div class="option-grid">
+          <button type="button" class="option-btn" data-field="caffeine" data-value="none">なし</button>
+          <button type="button" class="option-btn" data-field="caffeine" data-value="low">1日1杯</button>
+          <button type="button" class="option-btn" data-field="caffeine" data-value="medium">1日2-3杯</button>
+          <button type="button" class="option-btn" data-field="caffeine" data-value="high">1日4杯以上</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">アルコール摂取頻度</label>
+        <div class="option-grid">
+          <button type="button" class="option-btn" data-field="alcohol" data-value="none">なし</button>
+          <button type="button" class="option-btn" data-field="alcohol" data-value="weekly">週末のみ</button>
+          <button type="button" class="option-btn" data-field="alcohol" data-value="frequent">週3-4回</button>
+          <button type="button" class="option-btn" data-field="alcohol" data-value="daily">ほぼ毎日</button>
+        </div>
+      </div>
+      <div class="onboarding-actions">
+        <button class="secondary-btn" onclick="onboardBack(5)">戻る</button>
+        <button class="compute-btn" onclick="finishOnboarding()">完了する</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- APP SCREEN -->
+  <div id="appScreen" style="display: none;">
+
+    <!-- HEADER -->
+    <div class="app-header">
+      <div class="header-logo logo-full">
+        <svg class="logo-mark" width="32" height="32" aria-label="NEUSEN">
+          <use href="#neusenMark"/>
+        </svg>
+        <div class="logo-text-block">
+          <div class="logo-text-main">NEUSEN</div>
+          <div class="logo-text-sub">Human OS</div>
+        </div>
+      </div>
+      <div class="user-info">
+        <div class="streak-badge zero" id="streakBadge">🔥 <span id="streakDays">0</span></div>
+        <div class="user-info-text">
+          <div class="user-info-name" id="userName">—</div>
+          <div class="user-info-date" id="dateDisplay">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab active" data-tab="measure">MEASURE</button>
+      <button class="tab" data-tab="flow">FLOW</button>
+      <button class="tab" data-tab="history">HISTORY</button>
+      <button class="tab" data-tab="groups">COHORTS</button>
+      <button class="tab" data-tab="profile">PROFILE</button>
+    </div>
+
+    <!-- MEASURE TAB -->
+    <div class="tab-content active" id="tab-measure">
+
+      <div class="hos-display">
+        <div class="hos-content">
+          <div class="hos-label">HOS SCORE</div>
+          <div class="hos-score" id="hosScore">—</div>
+          <div class="hos-max">/ 100</div>
+          <div class="hos-state" id="hosState">未測定</div>
+          <div class="hos-recommendation" id="hosRecommendation">下のスライダーを動かして測定</div>
+          <div class="hos-trend" id="hosTrend"></div>
+          <div class="trend-label" id="trendLabel" style="display:none;">7-DAY TREND</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">
+          <span>OBJECTIVE · 客観データ</span>
+        </div>
+        <div class="auto-data-grid">
+          <div class="data-input-card">
+            <div class="data-input-label">Sleep</div>
+            <div class="data-input-jp">睡眠時間</div>
+            <input type="number" class="data-input-field" id="sleepHours" min="0" max="24" step="0.5" value="7">
+            <div class="data-input-unit">hours</div>
+          </div>
+          <div class="data-input-card">
+            <div class="data-input-label">HRV</div>
+            <div class="data-input-jp">心拍変動</div>
+            <input type="number" class="data-input-field" id="hrvRmssd" min="0" max="200" step="1" value="50">
+            <div class="data-input-unit">ms</div>
+          </div>
+        </div>
+        <div class="auto-note">※ Apple Health / Apple Watchの値を入力</div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">
+          <span>SUBJECTIVE · 主観入力</span>
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text-faint);">1 → 10</span>
+        </div>
+
+        <div class="slider-card">
+          <div class="slider-header">
+            <span class="slider-label-en">CLARITY</span>
+            <span class="slider-value" id="clarityValue">5</span>
+          </div>
+          <div class="slider-label-jp">認知の冴え · 頭の回転</div>
+          <div class="slider-track-wrapper">
+            <input type="range" class="slider-input" id="clarity" min="1" max="10" value="5" step="1">
+          </div>
+          <div class="slider-scale"><span>ぼんやり</span><span>5</span><span>鋭い</span></div>
+        </div>
+
+        <div class="slider-card">
+          <div class="slider-header">
+            <span class="slider-label-en">MOOD</span>
+            <span class="slider-value" id="moodValue">5</span>
+          </div>
+          <div class="slider-label-jp">感情の安定 · 落ち着き</div>
+          <div class="slider-track-wrapper">
+            <input type="range" class="slider-input" id="mood" min="1" max="10" value="5" step="1">
+          </div>
+          <div class="slider-scale"><span>不安定</span><span>5</span><span>安定</span></div>
+        </div>
+
+        <div class="slider-card">
+          <div class="slider-header">
+            <span class="slider-label-en">FLOW</span>
+            <span class="slider-value" id="flowValue">5</span>
+          </div>
+          <div class="slider-label-jp">フロー誘導性 · ゾーンに入れる感覚</div>
+          <div class="slider-track-wrapper">
+            <input type="range" class="slider-input" id="flow" min="1" max="10" value="5" step="1">
+          </div>
+          <div class="slider-scale"><span>散漫</span><span>5</span><span>ゾーン</span></div>
+        </div>
+
+        <div class="slider-card">
+          <div class="slider-header">
+            <span class="slider-label-en">ENERGY</span>
+            <span class="slider-value" id="fatigueValue">5</span>
+          </div>
+          <div class="slider-label-jp">活力 · 疲労の対極</div>
+          <div class="slider-track-wrapper">
+            <input type="range" class="slider-input" id="fatigue" min="1" max="10" value="5" step="1">
+          </div>
+          <div class="slider-scale"><span>疲弊</span><span>5</span><span>絶好調</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">
+          <span>NOTE · メモ(任意)</span>
+        </div>
+        <div class="note-card">
+          <textarea class="note-input" id="noteInput" placeholder="今日のコンテキスト・特記事項(例: 重要会議があった、徹夜明けなど)" maxlength="200"></textarea>
+          <div class="note-counter"><span id="noteCounter">0</span> / 200</div>
+        </div>
+      </div>
+
+      <button class="compute-btn" id="computeBtn">HOS を測定する</button>
+      <div id="saveStatus" style="margin-top: 12px;"></div>
+
+      <div class="indicator-breakdown" id="indicatorBreakdown">
+        <div class="section-title" style="margin-bottom: 12px;">BREAKDOWN · 内訳</div>
+        <div id="breakdownContent"></div>
+      </div>
+    </div>
+
+    <!-- HISTORY TAB -->
+    <div class="tab-content" id="tab-history">
+
+      <div class="stats-grid" id="statsGrid">
+        <div class="stat-card">
+          <div class="stat-label">Average</div>
+          <div class="stat-value" id="statAvg">—</div>
+          <div class="stat-sub">平均</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Best</div>
+          <div class="stat-value" id="statBest">—</div>
+          <div class="stat-sub">最高</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Records</div>
+          <div class="stat-value" id="statCount">0</div>
+          <div class="stat-sub">記録数</div>
+        </div>
+      </div>
+
+      <div class="section-title">
+        <span>YOUR RECORDS · 記録一覧</span>
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text-faint);">タップで編集</span>
+      </div>
+      <div id="historyList">
+        <div class="empty-state">
+          <div class="empty-state-icon">📊</div>
+          まだ記録がありません
+          <div class="empty-state-sub">最初のHOS測定から始めましょう</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COHORTS TAB (Replaced GROUPS in v22) -->
+    <div class="tab-content" id="tab-groups">
+      <div class="section-title">
+        <span>YOUR COHORTS · 参加中</span>
+        <span class="section-title-action" onclick="openCreateGroupModal()">+ 作成</span>
+      </div>
+      <div id="groupList">
+        <div class="empty-state">
+          <div class="empty-state-icon">🌐</div>
+          まだコホートに参加していません
+          <div class="empty-state-sub">研究コホートまたはイベントコホートに参加</div>
+        </div>
+      </div>
+
+      <button class="secondary-btn" onclick="openJoinGroupModal()">招待コードで参加</button>
+
+      <div id="groupDetailSection" style="display: none; margin-top: 28px;">
+        <div class="section-title">
+          <span id="currentGroupTitle">COHORT</span>
+          <span class="section-title-action" onclick="openInviteModal()">招待する</span>
+        </div>
+
+        <!-- Cohort Period & Status -->
+        <div id="cohortStatusCard" style="display: none;"></div>
+
+        <!-- Cohort Insights -->
+        <div id="cohortInsightsCard" style="display: none;"></div>
+
+        <!-- Sharing Settings Button -->
+        <button class="secondary-btn" onclick="openSharingSettingsModal()" id="sharingSettingsBtn" style="display: none; margin-bottom: 14px;">
+          <span style="font-size: 11px;">⚙️ 共有設定</span>
+        </button>
+
+        <!-- Leaderboard -->
+        <div class="section-title" style="margin-top: 18px;">
+          <span>LEADERBOARD · 今日のスコア</span>
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text-faint);">タップで詳細</span>
+        </div>
+        <div id="memberList"></div>
+      </div>
+    </div>
+
+    <!-- FLOW TAB (NEW in v21) -->
+    <div class="tab-content" id="tab-flow">
+      <!-- Active session display or start button -->
+      <div class="flow-session-card" id="flowSessionCard">
+        <div class="flow-session-content">
+          <div class="flow-session-header">
+            <div class="flow-session-label">FLOW SESSION</div>
+            <div class="flow-session-status" id="flowSessionStatus">READY</div>
+          </div>
+          <div id="flowSessionIdle">
+            <div class="flow-session-title">ゾーンセッション開始</div>
+            <div class="flow-session-sub">深い集中・競技・創造の時間を測定し、ゾーン誘導の再現性を高めます。</div>
+            <button class="flow-start-btn" onclick="openStartFlowModal()">START SESSION</button>
+          </div>
+          <div id="flowSessionActive" style="display: none;">
+            <div class="flow-timer-task" id="flowTimerTask">DEEP THINKING</div>
+            <div class="flow-timer-display" id="flowTimerDisplay">00:00</div>
+            <button class="flow-start-btn flow-end-btn" onclick="endFlowSession()">END SESSION</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="flow-stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Sessions</div>
+          <div class="stat-value" id="flowStatCount">0</div>
+          <div class="stat-sub">セッション数</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Zone Rate</div>
+          <div class="stat-value" id="flowStatZoneRate">—</div>
+          <div class="stat-sub">真ゾーン率</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Avg Min</div>
+          <div class="stat-value" id="flowStatAvgMin">—</div>
+          <div class="stat-sub">平均時間</div>
+        </div>
+      </div>
+
+      <!-- Insights -->
+      <div class="profile-card" id="flowInsightsCard" style="display: none;">
+        <div class="profile-card-title">INSIGHTS · 状況間再現性</div>
+        <div id="flowInsightsContent" style="font-size: 12px; color: var(--text-secondary); line-height: 1.7;"></div>
+      </div>
+
+      <!-- History -->
+      <div class="section-title">
+        <span>SESSIONS · 履歴</span>
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text-faint);">タップで詳細</span>
+      </div>
+      <div id="flowHistoryList">
+        <div class="empty-state">
+          <div class="empty-state-icon">⚡</div>
+          まだセッションがありません
+          <div class="empty-state-sub">最初のFlow Sessionから始めましょう</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROFILE TAB (NEW in v20) -->
+    <div class="tab-content" id="tab-profile">
+      <div class="section-title">
+        <span>YOUR PROFILE · プロフィール</span>
+        <span class="section-title-action" onclick="openEditProfileModal()">編集</span>
+      </div>
+
+      <div class="profile-card">
+        <div class="profile-card-title">BASIC · 基本情報</div>
+        <div class="profile-row"><span class="profile-row-label">年齢</span><span class="profile-row-value" id="prof-age">—</span></div>
+        <div class="profile-row"><span class="profile-row-label">性別</span><span class="profile-row-value" id="prof-sex">—</span></div>
+        <div class="profile-row"><span class="profile-row-label">身長</span><span class="profile-row-value" id="prof-height">—</span></div>
+        <div class="profile-row"><span class="profile-row-label">体重</span><span class="profile-row-value" id="prof-weight">—</span></div>
+        <div class="profile-row"><span class="profile-row-label">BMI</span><span class="profile-row-value" id="prof-bmi">—</span></div>
+      </div>
+
+      <div class="profile-card">
+        <div class="profile-card-title">LIFESTYLE · ライフスタイル</div>
+        <div class="profile-row"><span class="profile-row-label">職業タイプ</span><span class="profile-row-value" id="prof-occupation">—</span></div>
+        <div class="profile-row"><span class="profile-row-label">クロノタイプ</span><span class="profile-row-value" id="prof-chronotype">—</span></div>
+        <div class="profile-row"><span class="profile-row-label">運動頻度</span><span class="profile-row-value" id="prof-exercise">—</span></div>
+        <div class="profile-row"><span class="profile-row-label">理想睡眠時間</span><span class="profile-row-value" id="prof-sleepGoal">—</span></div>
+      </div>
+
+      <div class="profile-card">
+        <div class="profile-card-title">HABITS · 習慣</div>
+        <div class="profile-row"><span class="profile-row-label">食生活</span><span class="profile-row-value" id="prof-diet">—</span></div>
+        <div class="profile-row"><span class="profile-row-label">カフェイン</span><span class="profile-row-value" id="prof-caffeine">—</span></div>
+        <div class="profile-row"><span class="profile-row-label">アルコール</span><span class="profile-row-value" id="prof-alcohol">—</span></div>
+      </div>
+
+      <div class="profile-card">
+        <div class="profile-card-title">CALIBRATION · スコア補正</div>
+        <div style="font-size: 11px; color: var(--text-tertiary); margin-bottom: 8px; line-height: 1.6;">
+          このプロファイルに基づいてHOSスコアが補正されます。年齢・性別・職業によって基準値が変わるため、より正確な評価が可能です。
+        </div>
+        <div class="profile-row"><span class="profile-row-label">HRVベースライン</span><span class="profile-row-value" id="prof-hrvBase">—</span></div>
+        <div class="profile-row"><span class="profile-row-label">睡眠ベースライン</span><span class="profile-row-value" id="prof-sleepBase">—</span></div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="logo-text-block" style="align-items: center;">
+        <div class="logo-text-main">NEUSEN</div>
+        <div class="logo-text-sub">Human Operating System</div>
+      </div>
+      <div class="footer-meta">© 2026 株式会社NEUSEN · v22</div>
+      <a class="footer-link" onclick="signOut()">ログアウト</a>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================
+     MODALS
+     ======================================== -->
+
+<!-- Create Group Modal -->
+<div class="modal-backdrop" id="createGroupModal">
+  <div class="modal">
+    <div class="modal-title">コホート作成</div>
+    <div style="font-size: 11px; color: var(--text-tertiary); margin-bottom: 16px; line-height: 1.6;">
+      コホート = データ収集する仲間の集まり。長期研究または短期イベント用。
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">コホート名</label>
+      <input type="text" class="modal-input" id="newGroupName" placeholder="例: NEUSEN社内、ヨガリトリート2026/5">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">タイプ</label>
+      <div class="task-type-grid">
+        <button type="button" class="task-type-btn selected" data-cohorttype="longterm" id="cohortTypeLongterm">
+          <span class="task-type-emoji">🌱</span>長期研究
+          <div class="task-type-sub">数週間〜継続的に測定</div>
+        </button>
+        <button type="button" class="task-type-btn" data-cohorttype="event" id="cohortTypeEvent">
+          <span class="task-type-emoji">🎯</span>イベント
+          <div class="task-type-sub">短期・期日付きイベント</div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Event-specific date fields -->
+    <div id="eventDateFields" style="display: none;">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">開始日</label>
+          <input type="date" class="modal-input" id="cohortStartDate">
+        </div>
+        <div class="form-group">
+          <label class="form-label">終了日</label>
+          <input type="date" class="modal-input" id="cohortEndDate">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">場所(任意)</label>
+        <input type="text" class="modal-input" id="cohortLocation" placeholder="例: 京都、自宅">
+      </div>
+      <div class="form-group">
+        <label class="form-label">説明(任意)</label>
+        <textarea class="modal-input" id="cohortDescription" placeholder="このコホートの目的・背景など" style="min-height: 60px; resize: none;" maxlength="200"></textarea>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">表示モード(デフォルト)</label>
+      <div class="modal-options">
+        <label class="radio-option">
+          <input type="radio" name="visibility" value="real" checked>
+          <div>
+            <div class="radio-option-text">実名推奨</div>
+            <div class="radio-option-sub">参加者は実名で表示(個別に変更可)</div>
+          </div>
+        </label>
+        <label class="radio-option">
+          <input type="radio" name="visibility" value="anonymous">
+          <div>
+            <div class="radio-option-text">匿名推奨</div>
+            <div class="radio-option-sub">参加者はニックネームのみ表示</div>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="secondary-btn" onclick="closeModal('createGroupModal')">キャンセル</button>
+      <button class="compute-btn" onclick="createGroup()" style="margin-top: 0;">作成</button>
+    </div>
+  </div>
+</div>
+
+<!-- Join Group Modal -->
+<div class="modal-backdrop" id="joinGroupModal">
+  <div class="modal">
+    <div class="modal-title">コホートに参加</div>
+    <input type="text" class="modal-input" id="inviteCodeInput" placeholder="招待コード(6文字)" maxlength="6" style="text-transform: uppercase; font-family: 'Space Grotesk', monospace; font-weight: 600; letter-spacing: 0.2em; text-align: center; font-size: 18px;">
+
+    <div class="form-group">
+      <label class="form-label">表示モード</label>
+      <div class="modal-options">
+        <label class="radio-option">
+          <input type="radio" name="myDisplay" value="real" checked>
+          <div>
+            <div class="radio-option-text">実名で参加</div>
+            <div class="radio-option-sub">あなたの名前が表示されます</div>
+          </div>
+        </label>
+        <label class="radio-option">
+          <input type="radio" name="myDisplay" value="anonymous">
+          <div>
+            <div class="radio-option-text">匿名で参加</div>
+            <div class="radio-option-sub">ニックネームのみ表示</div>
+          </div>
+        </label>
+        <label class="radio-option">
+          <input type="radio" name="myDisplay" value="hidden">
+          <div>
+            <div class="radio-option-text">非公開で参加</div>
+            <div class="radio-option-sub">他のメンバーから見えません(あなたは見られます)</div>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <input type="text" class="modal-input" id="nicknameInput" placeholder="ニックネーム" style="display: none;">
+
+    <div class="form-group">
+      <label class="form-label">データ共有レベル</label>
+      <div class="sharing-options">
+        <label class="sharing-option">
+          <input type="radio" name="dataLevel" value="score">
+          <div class="sharing-option-content">
+            <div class="sharing-option-title">スコアのみ</div>
+            <div class="sharing-option-sub">HOSスコアと状態ラベルのみ共有</div>
+          </div>
+        </label>
+        <label class="sharing-option selected">
+          <input type="radio" name="dataLevel" value="stats" checked>
+          <div class="sharing-option-content">
+            <div class="sharing-option-title">スコア + 統計</div>
+            <div class="sharing-option-sub">スコア、6指標の値、ストリークまで(推奨)</div>
+          </div>
+        </label>
+        <label class="sharing-option">
+          <input type="radio" name="dataLevel" value="full">
+          <div class="sharing-option-content">
+            <div class="sharing-option-title">フル(生データ含む)</div>
+            <div class="sharing-option-sub">睡眠時間、HRV値、メモまで全公開(信頼関係前提)</div>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="secondary-btn" onclick="closeModal('joinGroupModal')">キャンセル</button>
+      <button class="compute-btn" onclick="joinGroup()" style="margin-top: 0;">参加</button>
+    </div>
+  </div>
+</div>
+
+<!-- Sharing Settings Modal (NEW in v22) -->
+<div class="modal-backdrop" id="sharingSettingsModal">
+  <div class="modal">
+    <div class="modal-title">共有設定</div>
+    <div style="font-size: 11px; color: var(--text-tertiary); margin-bottom: 16px; line-height: 1.6;">
+      このコホート内でのあなたの表示と、データ共有レベルを変更します。
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">表示モード</label>
+      <div class="modal-options">
+        <label class="radio-option">
+          <input type="radio" name="updateDisplay" value="real">
+          <div>
+            <div class="radio-option-text">実名</div>
+          </div>
+        </label>
+        <label class="radio-option">
+          <input type="radio" name="updateDisplay" value="anonymous">
+          <div>
+            <div class="radio-option-text">匿名</div>
+          </div>
+        </label>
+        <label class="radio-option">
+          <input type="radio" name="updateDisplay" value="hidden">
+          <div>
+            <div class="radio-option-text">非公開</div>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <input type="text" class="modal-input" id="updateNickname" placeholder="ニックネーム" style="display: none;">
+
+    <div class="form-group">
+      <label class="form-label">データ共有レベル</label>
+      <div class="sharing-options">
+        <label class="sharing-option">
+          <input type="radio" name="updateDataLevel" value="score">
+          <div class="sharing-option-content">
+            <div class="sharing-option-title">スコアのみ</div>
+            <div class="sharing-option-sub">HOSスコアと状態ラベルのみ</div>
+          </div>
+        </label>
+        <label class="sharing-option">
+          <input type="radio" name="updateDataLevel" value="stats">
+          <div class="sharing-option-content">
+            <div class="sharing-option-title">スコア + 統計</div>
+            <div class="sharing-option-sub">指標の値、ストリーク</div>
+          </div>
+        </label>
+        <label class="sharing-option">
+          <input type="radio" name="updateDataLevel" value="full">
+          <div class="sharing-option-content">
+            <div class="sharing-option-title">フル(生データ含む)</div>
+            <div class="sharing-option-sub">睡眠時間、HRV値、メモまで</div>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="secondary-btn" onclick="closeModal('sharingSettingsModal')">キャンセル</button>
+      <button class="compute-btn" onclick="saveSharingSettings()" style="margin-top: 0;">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Member Detail Modal (NEW in v22) -->
+<div class="modal-backdrop" id="memberDetailModal">
+  <div class="modal">
+    <div class="modal-title" id="memberDetailTitle">メンバー詳細</div>
+    <div id="memberDetailContent">
+      <div class="member-data-restricted">読み込み中...</div>
+    </div>
+    <button class="secondary-btn" onclick="closeModal('memberDetailModal')" style="margin-top: 16px;">閉じる</button>
+  </div>
+</div>
+
+<!-- Invite Modal -->
+<div class="modal-backdrop" id="inviteModal">
+  <div class="modal">
+    <div class="modal-title">グループに招待</div>
+    <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.7;">
+      招待リンクをシェアすると、相手は1タップでグループに参加できます。
+    </div>
+    <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text-faint); letter-spacing: 0.2em; text-align: center;">招待コード</div>
+    <div class="invite-code-display" id="inviteCodeDisplay">—</div>
+    <div class="invite-link-display" id="inviteLinkDisplay">—</div>
+    <div class="invite-buttons">
+      <button class="invite-btn" onclick="shareLINE()">
+        <span class="invite-btn-icon">💬</span>LINE
+      </button>
+      <button class="invite-btn" onclick="shareEmail()">
+        <span class="invite-btn-icon">✉️</span>メール
+      </button>
+      <button class="invite-btn" onclick="copyInviteLink()">
+        <span class="invite-btn-icon">📋</span>コピー
+      </button>
+    </div>
+    <button class="secondary-btn" onclick="closeModal('inviteModal')" style="margin-top: 16px;">閉じる</button>
+  </div>
+</div>
+
+<!-- Edit Record Modal -->
+<div class="modal-backdrop" id="editModal">
+  <div class="modal">
+    <div class="modal-title">記録を編集</div>
+    <div style="font-size: 11px; color: var(--text-faint); margin-bottom: 12px; font-family: 'JetBrains Mono', monospace;" id="editRecordDate">—</div>
+
+    <div style="margin-bottom: 12px;">
+      <label style="font-size: 11px; color: var(--text-secondary); font-weight: 500; letter-spacing: 0.1em;">SLEEP (時間)</label>
+      <input type="number" class="modal-input" id="editSleep" min="0" max="24" step="0.5" style="margin-top: 6px;">
+    </div>
+    <div style="margin-bottom: 12px;">
+      <label style="font-size: 11px; color: var(--text-secondary); font-weight: 500; letter-spacing: 0.1em;">HRV (ms)</label>
+      <input type="number" class="modal-input" id="editHrv" min="0" max="200" step="1" style="margin-top: 6px;">
+    </div>
+    <div style="margin-bottom: 12px;">
+      <label style="font-size: 11px; color: var(--text-secondary); font-weight: 500; letter-spacing: 0.1em;">CLARITY: <span id="editClarityVal" style="color: var(--brand-cyan); font-weight: 700;">5</span></label>
+      <input type="range" class="slider-input" id="editClarity" min="1" max="10" step="1" style="width: 100%; margin-top: 10px;">
+    </div>
+    <div style="margin-bottom: 12px;">
+      <label style="font-size: 11px; color: var(--text-secondary); font-weight: 500; letter-spacing: 0.1em;">MOOD: <span id="editMoodVal" style="color: var(--brand-cyan); font-weight: 700;">5</span></label>
+      <input type="range" class="slider-input" id="editMood" min="1" max="10" step="1" style="width: 100%; margin-top: 10px;">
+    </div>
+    <div style="margin-bottom: 12px;">
+      <label style="font-size: 11px; color: var(--text-secondary); font-weight: 500; letter-spacing: 0.1em;">FLOW: <span id="editFlowVal" style="color: var(--brand-cyan); font-weight: 700;">5</span></label>
+      <input type="range" class="slider-input" id="editFlow" min="1" max="10" step="1" style="width: 100%; margin-top: 10px;">
+    </div>
+    <div style="margin-bottom: 12px;">
+      <label style="font-size: 11px; color: var(--text-secondary); font-weight: 500; letter-spacing: 0.1em;">ENERGY: <span id="editFatigueVal" style="color: var(--brand-cyan); font-weight: 700;">5</span></label>
+      <input type="range" class="slider-input" id="editFatigue" min="1" max="10" step="1" style="width: 100%; margin-top: 10px;">
+    </div>
+    <div style="margin-bottom: 16px;">
+      <label style="font-size: 11px; color: var(--text-secondary); font-weight: 500; letter-spacing: 0.1em;">NOTE</label>
+      <textarea class="modal-input" id="editNote" placeholder="メモ" style="margin-top: 6px; min-height: 60px; resize: none;"></textarea>
+    </div>
+
+    <div class="modal-actions">
+      <button class="secondary-btn" onclick="closeModal('editModal')">キャンセル</button>
+      <button class="compute-btn" onclick="saveEditedRecord()" style="margin-top: 0;">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirm Modal -->
+<div class="modal-backdrop" id="deleteModal">
+  <div class="modal">
+    <div class="modal-title" style="color: var(--brand-red);">記録を削除</div>
+    <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 20px; line-height: 1.7;">
+      この記録を完全に削除します。<br>
+      この操作は取り消せません。
+    </div>
+    <div id="deleteRecordPreview" style="background: var(--bg-card); border: 1px solid var(--border-default); border-radius: var(--r-md); padding: 14px; margin-bottom: 18px;"></div>
+    <div class="modal-actions">
+      <button class="secondary-btn" onclick="closeModal('deleteModal')">キャンセル</button>
+      <button class="compute-btn danger-btn" onclick="confirmDeleteRecord()" style="margin-top: 0; background: var(--brand-red); border: none; box-shadow: 0 8px 24px rgba(255, 94, 108, 0.3);">削除する</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Profile Modal (NEW in v20) -->
+<div class="modal-backdrop" id="editProfileModal">
+  <div class="modal">
+    <div class="modal-title">プロファイル編集</div>
+    <div style="font-size: 11px; color: var(--text-tertiary); margin-bottom: 16px;">変更すると今後のHOSスコア計算に反映されます。</div>
+    <div class="form-group">
+      <label class="form-label">体重 (kg)</label>
+      <input type="number" class="modal-input" id="editProfWeight" min="20" max="200" step="0.1">
+    </div>
+    <div class="form-group">
+      <label class="form-label">身長 (cm)</label>
+      <input type="number" class="modal-input" id="editProfHeight" min="100" max="250" step="0.1">
+    </div>
+    <div class="form-group">
+      <label class="form-label">職業タイプ</label>
+      <select class="form-select" id="editProfOccupation">
+        <option value="executive">経営者・幹部</option>
+        <option value="desk">デスクワーク</option>
+        <option value="athlete">アスリート</option>
+        <option value="creative">クリエイター</option>
+        <option value="shift">シフト勤務</option>
+        <option value="other">その他</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">クロノタイプ</label>
+      <select class="form-select" id="editProfChronotype">
+        <option value="morning">朝型</option>
+        <option value="middle">中間</option>
+        <option value="evening">夜型</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">運動頻度</label>
+      <select class="form-select" id="editProfExercise">
+        <option value="none">ほぼしない</option>
+        <option value="light">週1-2回</option>
+        <option value="moderate">週3-4回</option>
+        <option value="intense">週5回以上</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">理想睡眠時間</label>
+      <input type="number" class="modal-input" id="editProfSleepGoal" min="4" max="12" step="0.5">
+    </div>
+    <div class="form-group">
+      <label class="form-label">食生活</label>
+      <select class="form-select" id="editProfDiet">
+        <option value="standard">標準</option>
+        <option value="lowcarb">低糖質</option>
+        <option value="fasting">断食実践</option>
+        <option value="vegetarian">ベジタリアン</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">カフェイン摂取</label>
+      <select class="form-select" id="editProfCaffeine">
+        <option value="none">なし</option>
+        <option value="low">1日1杯</option>
+        <option value="medium">1日2-3杯</option>
+        <option value="high">1日4杯以上</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">アルコール頻度</label>
+      <select class="form-select" id="editProfAlcohol">
+        <option value="none">なし</option>
+        <option value="weekly">週末のみ</option>
+        <option value="frequent">週3-4回</option>
+        <option value="daily">ほぼ毎日</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="secondary-btn" onclick="closeModal('editProfileModal')">キャンセル</button>
+      <button class="compute-btn" onclick="saveEditedProfile()" style="margin-top: 0;">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Flow Session Start Modal (NEW in v21) -->
+<div class="modal-backdrop" id="startFlowModal">
+  <div class="modal">
+    <div class="modal-title">セッション開始</div>
+    <div style="font-size: 11px; color: var(--text-tertiary); margin-bottom: 16px; line-height: 1.6;">
+      これから取り組むタスクの種類と難度を記録します。
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">タスク種別</label>
+      <div class="task-type-grid">
+        <button type="button" class="task-type-btn" data-tasktype="thinking">
+          <span class="task-type-emoji">🧠</span>深い思考
+          <div class="task-type-sub">戦略・分析・判断</div>
+        </button>
+        <button type="button" class="task-type-btn" data-tasktype="creative">
+          <span class="task-type-emoji">🎨</span>創造
+          <div class="task-type-sub">執筆・デザイン</div>
+        </button>
+        <button type="button" class="task-type-btn" data-tasktype="competition">
+          <span class="task-type-emoji">🏆</span>競技
+          <div class="task-type-sub">試合・大会本番</div>
+        </button>
+        <button type="button" class="task-type-btn" data-tasktype="training">
+          <span class="task-type-emoji">🏃</span>練習
+          <div class="task-type-sub">スキル習得</div>
+        </button>
+        <button type="button" class="task-type-btn" data-tasktype="execution">
+          <span class="task-type-emoji">⚡</span>実行
+          <div class="task-type-sub">実装・作業</div>
+        </button>
+        <button type="button" class="task-type-btn" data-tasktype="meeting">
+          <span class="task-type-emoji">💬</span>対話
+          <div class="task-type-sub">商談・議論</div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Athlete-specific: practice/qualifier/race -->
+    <div class="form-group" id="competitionContextGroup" style="display: none;">
+      <label class="form-label">セッションの位置づけ</label>
+      <div class="session-context-grid">
+        <button type="button" class="context-btn" data-context="practice">PRACTICE</button>
+        <button type="button" class="context-btn" data-context="qualifier">QUALIFIER</button>
+        <button type="button" class="context-btn" data-context="race">RACE</button>
+      </div>
+    </div>
+
+    <div class="form-group" id="eventGroup" style="display: none;">
+      <label class="form-label">競技種目(任意)</label>
+      <input type="text" class="modal-input" id="flowEvent" placeholder="例: 100m, マラソン, 走幅跳び">
+    </div>
+
+    <div class="modal-slider-card">
+      <div class="modal-slider-header">
+        <span class="modal-slider-label">難度 CHALLENGE</span>
+        <span class="modal-slider-value" id="flowChallengeVal">5</span>
+      </div>
+      <div class="modal-slider-jp">課題の難しさ(1-10)</div>
+      <input type="range" class="slider-input" id="flowChallenge" min="1" max="10" step="1" value="5">
+    </div>
+
+    <div class="modal-slider-card">
+      <div class="modal-slider-header">
+        <span class="modal-slider-label">スキル SKILL</span>
+        <span class="modal-slider-value" id="flowSkillVal">5</span>
+      </div>
+      <div class="modal-slider-jp">自分のスキルレベル(1-10)</div>
+      <input type="range" class="slider-input" id="flowSkill" min="1" max="10" step="1" value="5">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">直前の活動(任意)</label>
+      <input type="text" class="modal-input" id="flowPreActivity" placeholder="例: ストレッチ後、ランチ後30分、コーヒー1杯">
+    </div>
+
+    <div class="modal-actions">
+      <button class="secondary-btn" onclick="closeModal('startFlowModal')">キャンセル</button>
+      <button class="compute-btn" onclick="startFlowSession()" style="margin-top: 0;">START</button>
+    </div>
+  </div>
+</div>
+
+<!-- Flow Session End Modal (NEW in v21) -->
+<div class="modal-backdrop" id="endFlowModal">
+  <div class="modal">
+    <div class="modal-title">セッション完了</div>
+    <div style="font-size: 11px; color: var(--text-tertiary); margin-bottom: 4px;">経過時間</div>
+    <div style="font-family: 'Space Grotesk'; font-weight: 700; font-size: 36px; background: linear-gradient(135deg, var(--brand-pink), var(--brand-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 20px; font-variant-numeric: tabular-nums;" id="endFlowDuration">00:00</div>
+
+    <!-- A: Subjective Flow -->
+    <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--brand-pink); letter-spacing: 0.25em; text-transform: uppercase; margin-bottom: 8px;">A · 主観的フロー</div>
+
+    <div class="modal-slider-card">
+      <div class="modal-slider-header">
+        <span class="modal-slider-label">FLOW LEVEL</span>
+        <span class="modal-slider-value" id="endFlowLevelVal">5</span>
+      </div>
+      <div class="modal-slider-jp">ゾーンに入った感覚(1-10)</div>
+      <input type="range" class="slider-input" id="endFlowLevel" min="1" max="10" step="1" value="5">
+    </div>
+
+    <div class="modal-slider-card">
+      <div class="modal-slider-header">
+        <span class="modal-slider-label">TIME DISTORTION</span>
+        <span class="modal-slider-value" id="endTimeDistortionVal">5</span>
+      </div>
+      <div class="modal-slider-jp">時間感覚の歪み(1=普通, 10=極端)</div>
+      <input type="range" class="slider-input" id="endTimeDistortion" min="1" max="10" step="1" value="5">
+    </div>
+
+    <div class="modal-slider-card">
+      <div class="modal-slider-header">
+        <span class="modal-slider-label">FOCUS</span>
+        <span class="modal-slider-value" id="endFocusVal">5</span>
+      </div>
+      <div class="modal-slider-jp">集中の質(1-10)</div>
+      <input type="range" class="slider-input" id="endFocus" min="1" max="10" step="1" value="5">
+    </div>
+
+    <!-- C: Performance -->
+    <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--brand-cyan); letter-spacing: 0.25em; text-transform: uppercase; margin: 16px 0 8px;">C · パフォーマンス</div>
+
+    <div class="modal-slider-card">
+      <div class="modal-slider-header">
+        <span class="modal-slider-label">OUTCOME</span>
+        <span class="modal-slider-value" id="endOutcomeVal">5</span>
+      </div>
+      <div class="modal-slider-jp">いつもより明らかに高い結果か(1-10)</div>
+      <input type="range" class="slider-input" id="endOutcome" min="1" max="10" step="1" value="5">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">パフォーマンス記録(任意)</label>
+      <input type="text" class="modal-input" id="endPerformanceMetric" placeholder="例: 100m 10.85秒、3000字執筆、商談成立">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">セッションメモ(任意)</label>
+      <textarea class="modal-input" id="endFlowNote" placeholder="気づき・条件・特記事項" style="min-height: 60px; resize: none;" maxlength="300"></textarea>
+    </div>
+
+    <div class="modal-actions">
+      <button class="secondary-btn" onclick="cancelFlowSession()">破棄</button>
+      <button class="compute-btn" onclick="saveFlowSession()" style="margin-top: 0;">保存</button>
+    </div>
+  </div>
+</div>
+
+<div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div></div>
+
+<div class="celebration" id="celebration">
+  <div class="celebration-message">
+    <span class="celebration-emoji" id="celebrationEmoji">🎉</span>
+    <div class="celebration-title" id="celebrationTitle">Streak Day 7</div>
+    <div class="celebration-sub" id="celebrationSub">7日連続記録達成!</div>
+  </div>
+</div>
+
+<!-- ========================================
+     SCRIPT
+     ======================================== -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut as fbSignOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc, collection, addDoc, query, where, orderBy, limit, getDocs, serverTimestamp, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyBIiVnTE2UjekzHAuv-xzKjD7r-4W_PPCs",
+  authDomain: "neusen-app.firebaseapp.com",
+  projectId: "neusen-app",
+  storageBucket: "neusen-app.firebasestorage.app",
+  messagingSenderId: "738602817673",
+  appId: "1:738602817673:web:7a2b03f23f4c24efa8ce58",
+  measurementId: "G-340VSS3T0R"
+};
+
+const app = initializeApp(FIREBASE_CONFIG);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let currentUser = null;
+let currentProfile = null;
+let currentGroupId = null;
+let myGroups = [];
+let editingRecordId = null;
+let deletingRecordId = null;
+let historyRecords = [];
+let onboardingData = {};
+
+// Haptic feedback (iOS Safari supports limited haptics via vibration API)
+function haptic(pattern = 10) {
+  if (navigator.vibrate) navigator.vibrate(pattern);
+}
+
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    currentUser = user;
+    const profile = await loadProfile(user);
+    if (!profile || !profile.onboardingCompleted) {
+      showOnboarding();
+    } else {
+      currentProfile = profile;
+      showApp();
+      renderProfile();
+      await loadMyGroups();
+      await loadHistory();
+      await loadFlowSessions();
+      checkInviteFromURL();
+    }
+  } else {
+    currentUser = null;
+    currentProfile = null;
+    showLogin();
+  }
+});
+
+window.googleSignIn = async function() {
+  showLoading(true);
+  try {
+    const provider = new GoogleAuthProvider();
+    await signInWithPopup(auth, provider);
+  } catch (error) {
+    alert('ログイン失敗: ' + error.message);
+  }
+  showLoading(false);
+};
+
+window.signOut = async function() {
+  if (confirm('ログアウトしますか?')) await fbSignOut(auth);
+};
+
+async function loadProfile(user) {
+  const userRef = doc(db, 'users', user.uid);
+  const userSnap = await getDoc(userRef);
+  if (userSnap.exists()) {
+    return userSnap.data();
+  } else {
+    await setDoc(userRef, {
+      email: user.email,
+      displayName: user.displayName || 'User',
+      photoURL: user.photoURL || null,
+      createdAt: serverTimestamp(),
+      onboardingCompleted: false
+    });
+    return null;
+  }
+}
+
+function showLogin() {
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('onboardingScreen').classList.remove('active');
+  document.getElementById('appScreen').style.display = 'none';
+}
+
+function showOnboarding() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('onboardingScreen').classList.add('active');
+  document.getElementById('appScreen').style.display = 'none';
+}
+
+function showApp() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('onboardingScreen').classList.remove('active');
+  document.getElementById('appScreen').style.display = 'block';
+  document.getElementById('userName').textContent = currentUser.displayName || 'User';
+  updateDateDisplay();
+}
+
+function showLoading(visible) {
+  document.getElementById('loadingOverlay').classList.toggle('visible', visible);
+}
+
+function showStatus(message, type = '') {
+  const el = document.getElementById('saveStatus');
+  el.innerHTML = `<div class="status-message ${type}">${message}</div>`;
+  if (type === 'success') setTimeout(() => { el.innerHTML = ''; }, 3000);
+}
+
+// ========================================
+// HOS CALCULATION (Profile-aware, 1-10 scale)
+// ========================================
+const WEIGHTS = { sleep: 0.20, hrv: 0.20, clarity: 0.15, mood: 0.15, flow: 0.15, fatigue: 0.15 };
+
+function clamp(v, mn, mx) { return Math.min(Math.max(v, mn), mx); }
+
+// Calculate age from birth date
+function calculateAge(profile) {
+  if (!profile || !profile.birthYear) return 35;
+  const today = new Date();
+  let age = today.getFullYear() - profile.birthYear;
+  const m = today.getMonth() + 1;
+  if (m < profile.birthMonth || (m === profile.birthMonth && today.getDate() < profile.birthDay)) {
+    age--;
+  }
+  return age;
+}
+
+// Age and sex-adjusted HRV baseline (RMSSD ms)
+// Based on Umetani et al. 1998, Nunan et al. 2010 normative data
+function getHRVBaseline(profile) {
+  if (!profile) return 45;
+  const age = calculateAge(profile);
+  let base;
+  if (age < 25) base = 60;
+  else if (age < 35) base = 50;
+  else if (age < 45) base = 42;
+  else if (age < 55) base = 35;
+  else if (age < 65) base = 30;
+  else base = 25;
+
+  // Sex adjustment (women slightly higher in some age ranges)
+  if (profile.sex === 'female') base *= 1.05;
+
+  // Activity level boost
+  if (profile.occupation === 'athlete' || profile.exercise === 'intense') base *= 1.2;
+  else if (profile.exercise === 'moderate') base *= 1.1;
+
+  return Math.round(base);
+}
+
+// Personal sleep baseline
+function getSleepBaseline(profile) {
+  if (profile && profile.sleepGoal) return profile.sleepGoal;
+  if (!profile) return 7.5;
+  const age = calculateAge(profile);
+  if (age < 25) return 8.0;
+  if (age < 65) return 7.5;
+  return 7.0;
+}
+
+function calcSleep(h, profile) {
+  if (!h || h <= 0) return { score: 50, confidence: 0 };
+  const target = getSleepBaseline(profile);
+  const ratio = h / target;
+  let s;
+  if (ratio >= 1.0) s = 95;
+  else if (ratio >= 0.93) s = 85;
+  else if (ratio >= 0.87) s = 75;
+  else if (ratio >= 0.80) s = 65;
+  else if (ratio >= 0.70) s = 50;
+  else s = 30;
+  // Athlete needs more recovery sleep
+  if (profile && profile.occupation === 'athlete' && ratio < 1.0) s -= 5;
+  return { score: clamp(s, 0, 100), confidence: 1.0 };
+}
+
+function calcHRV(h, profile) {
+  if (!h || h <= 0) return { score: 50, confidence: 0 };
+  const baseline = getHRVBaseline(profile);
+  const ratio = h / baseline;
+  let s;
+  if (ratio >= 1.3) s = 95;
+  else if (ratio >= 1.1) s = 85;
+  else if (ratio >= 0.95) s = 75;
+  else if (ratio >= 0.80) s = 60;
+  else if (ratio >= 0.65) s = 45;
+  else s = 30;
+  return { score: clamp(s, 0, 100), confidence: 1.0 };
+}
+
+function calcSlider(v) { return { score: Math.round((v - 1) * 100 / 9), confidence: 1.0 }; }
+
+function calcFlow(v, hrvScore, profile) {
+  let s = (v - 1) * 100 / 9;
+  if (hrvScore >= 80 && v >= 8) s = Math.min(100, s + 5);
+  if (profile && (profile.occupation === 'creative' || profile.occupation === 'athlete') && v >= 7) {
+    s = Math.min(100, s + 3);
+  }
+  return { score: Math.round(clamp(s, 0, 100)), confidence: 1.0 };
+}
+
+function calcFatigue(v, profile) {
+  let s = (v - 1) * 100 / 9;
+  // High caffeine may mask fatigue
+  if (profile && profile.caffeine === 'high' && v >= 7) s -= 3;
+  return { score: Math.round(clamp(s, 0, 100)), confidence: 1.0 };
+}
+
+function calculateHOS(input, profile) {
+  const sleep = calcSleep(input.sleep_hours, profile);
+  const hrv = calcHRV(input.hrv_rmssd, profile);
+  const clarity = calcSlider(input.clarity);
+  const mood = calcSlider(input.mood);
+  const flow = calcFlow(input.flow, hrv.score, profile);
+  const fatigue = calcFatigue(input.fatigue, profile);
+
+  const total = Math.round(
+    sleep.score * WEIGHTS.sleep + hrv.score * WEIGHTS.hrv +
+    clarity.score * WEIGHTS.clarity + mood.score * WEIGHTS.mood +
+    flow.score * WEIGHTS.flow + fatigue.score * WEIGHTS.fatigue
+  );
+
+  return {
+    total,
+    indicators: { sleep, hrv, clarity, mood, flow, fatigue },
+    state_label: getState(total),
+    recommendation: getRec(total, { sleep, hrv, clarity, mood, flow, fatigue }, profile)
+  };
+}
+
+function getState(s) {
+  if (s >= 90) return 'Peak State';
+  if (s >= 80) return 'Sharp Mind';
+  if (s >= 70) return 'Decision Ready';
+  if (s >= 60) return 'Steady';
+  if (s >= 50) return 'Low Resolution';
+  if (s >= 40) return 'Foggy';
+  return 'Reset Required';
+}
+
+function getRec(total, ind, profile) {
+  let weakest = 'sleep', minScore = 100;
+  for (const [k, v] of Object.entries(ind)) {
+    if (v.score < minScore) { minScore = v.score; weakest = k; }
+  }
+  // Personalized golden time based on chronotype
+  const goldenTime = (profile && profile.chronotype === 'evening') ? '21時以降' :
+                     (profile && profile.chronotype === 'morning') ? '午前6-10時' :
+                     '午前中';
+  if (total >= 85) return `判断のゴールデンタイム · ${goldenTime}が特に最適`;
+  if (total >= 70) {
+    if (weakest === 'sleep') return `重要な判断は${goldenTime}に`;
+    if (weakest === 'hrv') return '深呼吸してから判断を';
+    if (weakest === 'fatigue') return '判断は午前3つまでに';
+    return `通常運転OK · ${goldenTime}が最適`;
+  }
+  if (total >= 55) {
+    if (weakest === 'sleep') return '判断より、まず10分の仮眠を';
+    if (weakest === 'mood') return '感情を整えてから判断を';
+    if (weakest === 'flow') return '今日は深い思考を避けて';
+    return '判断より運動と睡眠を優先';
+  }
+  return '今日は決めない勇気を';
+}
+
+// ========================================
+// ONBOARDING (NEW in v20)
+// ========================================
+window.onboardNext = function(currentStep) {
+  if (currentStep === 1) {
+    const y = document.getElementById('profileBirthYear').value;
+    const m = document.getElementById('profileBirthMonth').value;
+    const d = document.getElementById('profileBirthDay').value;
+    if (!y || !m || !d) { alert('生年月日を入力してください'); return; }
+    if (!onboardingData.sex) { alert('性別を選択してください'); return; }
+    onboardingData.birthYear = parseInt(y);
+    onboardingData.birthMonth = parseInt(m);
+    onboardingData.birthDay = parseInt(d);
+  }
+  if (currentStep === 2) {
+    const h = document.getElementById('profileHeight').value;
+    const w = document.getElementById('profileWeight').value;
+    if (!h || !w) { alert('身長・体重を入力してください'); return; }
+    onboardingData.height = parseFloat(h);
+    onboardingData.weight = parseFloat(w);
+  }
+  if (currentStep === 3) {
+    if (!onboardingData.occupation) { alert('職業タイプを選択してください'); return; }
+    if (!onboardingData.chronotype) { alert('クロノタイプを選択してください'); return; }
+  }
+  if (currentStep === 4) {
+    const sleepGoal = document.getElementById('profileSleepGoal').value;
+    if (!onboardingData.exercise) { alert('運動頻度を選択してください'); return; }
+    if (!sleepGoal) { alert('理想睡眠時間を入力してください'); return; }
+    if (!onboardingData.diet) { alert('食生活タイプを選択してください'); return; }
+    onboardingData.sleepGoal = parseFloat(sleepGoal);
+  }
+  goToStep(currentStep + 1);
+};
+
+window.onboardBack = function(currentStep) {
+  goToStep(currentStep - 1);
+};
+
+function goToStep(step) {
+  haptic(5);
+  document.querySelectorAll('.onboarding-step').forEach(s => s.classList.remove('active'));
+  const target = document.querySelector('.onboarding-step[data-step="' + step + '"]');
+  if (target) target.classList.add('active');
+  const dots = document.querySelectorAll('.progress-dot');
+  dots.forEach((dot, i) => {
+    dot.classList.remove('active', 'completed');
+    if (i + 1 < step) dot.classList.add('completed');
+    else if (i + 1 === step) dot.classList.add('active');
+  });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+window.finishOnboarding = async function() {
+  if (!onboardingData.caffeine) { alert('カフェイン摂取量を選択してください'); return; }
+  if (!onboardingData.alcohol) { alert('アルコール摂取頻度を選択してください'); return; }
+
+  showLoading(true);
+  try {
+    const userRef = doc(db, 'users', currentUser.uid);
+    await updateDoc(userRef, {
+      ...onboardingData,
+      onboardingCompleted: true,
+      profileUpdatedAt: serverTimestamp()
+    });
+    const profile = await loadProfile(currentUser);
+    currentProfile = profile;
+    showLoading(false);
+    showApp();
+    renderProfile();
+    await loadMyGroups();
+    await loadHistory();
+    await loadFlowSessions();
+    haptic([20, 50, 30, 50, 30]);
+  } catch (error) {
+    showLoading(false);
+    alert('保存失敗: ' + error.message);
+  }
+};
+
+// Option button click handler for onboarding
+document.addEventListener('click', (e) => {
+  const btn = e.target.classList && e.target.classList.contains('option-btn') ? e.target : (e.target.closest && e.target.closest('.option-btn'));
+  if (!btn) return;
+  const field = btn.dataset.field;
+  const value = btn.dataset.value;
+  if (!field) return;
+  haptic(8);
+  document.querySelectorAll('.option-btn[data-field="' + field + '"]').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  onboardingData[field] = value;
+});
+
+// ========================================
+// PROFILE TAB RENDERING (NEW in v20)
+// ========================================
+const PROFILE_LABELS = {
+  sex: { male: '男性', female: '女性', other: 'その他' },
+  occupation: { executive: '経営者・幹部', desk: 'デスクワーク', athlete: 'アスリート', creative: 'クリエイター', shift: 'シフト勤務', other: 'その他' },
+  chronotype: { morning: '朝型', middle: '中間', evening: '夜型' },
+  exercise: { none: 'ほぼしない', light: '週1-2回', moderate: '週3-4回', intense: '週5回以上' },
+  diet: { standard: '標準', lowcarb: '低糖質', fasting: '断食実践', vegetarian: 'ベジタリアン' },
+  caffeine: { none: 'なし', low: '1日1杯', medium: '1日2-3杯', high: '1日4杯以上' },
+  alcohol: { none: 'なし', weekly: '週末のみ', frequent: '週3-4回', daily: 'ほぼ毎日' }
+};
+
+function renderProfile() {
+  if (!currentProfile) return;
+  const p = currentProfile;
+  document.getElementById('prof-age').textContent = p.birthYear ? (calculateAge(p) + ' 歳') : '—';
+  document.getElementById('prof-sex').textContent = PROFILE_LABELS.sex[p.sex] || '—';
+  document.getElementById('prof-height').textContent = p.height ? (p.height + ' cm') : '—';
+  document.getElementById('prof-weight').textContent = p.weight ? (p.weight + ' kg') : '—';
+  if (p.height && p.weight) {
+    const bmi = (p.weight / Math.pow(p.height / 100, 2)).toFixed(1);
+    document.getElementById('prof-bmi').textContent = bmi;
+  } else {
+    document.getElementById('prof-bmi').textContent = '—';
+  }
+  document.getElementById('prof-occupation').textContent = PROFILE_LABELS.occupation[p.occupation] || '—';
+  document.getElementById('prof-chronotype').textContent = PROFILE_LABELS.chronotype[p.chronotype] || '—';
+  document.getElementById('prof-exercise').textContent = PROFILE_LABELS.exercise[p.exercise] || '—';
+  document.getElementById('prof-sleepGoal').textContent = p.sleepGoal ? (p.sleepGoal + ' 時間') : '—';
+  document.getElementById('prof-diet').textContent = PROFILE_LABELS.diet[p.diet] || '—';
+  document.getElementById('prof-caffeine').textContent = PROFILE_LABELS.caffeine[p.caffeine] || '—';
+  document.getElementById('prof-alcohol').textContent = PROFILE_LABELS.alcohol[p.alcohol] || '—';
+  document.getElementById('prof-hrvBase').textContent = getHRVBaseline(p) + ' ms';
+  document.getElementById('prof-sleepBase').textContent = getSleepBaseline(p) + ' 時間';
+}
+
+window.openEditProfileModal = function() {
+  if (!currentProfile) return;
+  const p = currentProfile;
+  document.getElementById('editProfHeight').value = p.height || '';
+  document.getElementById('editProfWeight').value = p.weight || '';
+  document.getElementById('editProfOccupation').value = p.occupation || 'desk';
+  document.getElementById('editProfChronotype').value = p.chronotype || 'middle';
+  document.getElementById('editProfExercise').value = p.exercise || 'light';
+  document.getElementById('editProfSleepGoal').value = p.sleepGoal || 7.5;
+  document.getElementById('editProfDiet').value = p.diet || 'standard';
+  document.getElementById('editProfCaffeine').value = p.caffeine || 'none';
+  document.getElementById('editProfAlcohol').value = p.alcohol || 'none';
+  document.getElementById('editProfileModal').classList.add('visible');
+};
+
+window.saveEditedProfile = async function() {
+  const updates = {
+    height: parseFloat(document.getElementById('editProfHeight').value) || currentProfile.height,
+    weight: parseFloat(document.getElementById('editProfWeight').value) || currentProfile.weight,
+    occupation: document.getElementById('editProfOccupation').value,
+    chronotype: document.getElementById('editProfChronotype').value,
+    exercise: document.getElementById('editProfExercise').value,
+    sleepGoal: parseFloat(document.getElementById('editProfSleepGoal').value) || currentProfile.sleepGoal,
+    diet: document.getElementById('editProfDiet').value,
+    caffeine: document.getElementById('editProfCaffeine').value,
+    alcohol: document.getElementById('editProfAlcohol').value,
+    profileUpdatedAt: serverTimestamp()
+  };
+  showLoading(true);
+  try {
+    await updateDoc(doc(db, 'users', currentUser.uid), updates);
+    Object.assign(currentProfile, updates);
+    closeModal('editProfileModal');
+    renderProfile();
+    showLoading(false);
+    haptic(20);
+  } catch (error) {
+    showLoading(false);
+    alert('保存失敗: ' + error.message);
+  }
+};
+
+// ========================================
+// FLOW SESSION (NEW in v21)
+// ========================================
+let activeFlowSession = null;
+let flowTimerInterval = null;
+let flowSessions = [];
+let selectedTaskType = null;
+let selectedSessionContext = null;
+
+const TASK_TYPE_LABELS = {
+  thinking: { label: '深い思考', en: 'DEEP THINKING' },
+  creative: { label: '創造', en: 'CREATIVE WORK' },
+  competition: { label: '競技', en: 'COMPETITION' },
+  training: { label: '練習', en: 'TRAINING' },
+  execution: { label: '実行', en: 'EXECUTION' },
+  meeting: { label: '対話', en: 'MEETING' }
+};
+
+const SESSION_CONTEXT_LABELS = {
+  practice: '練習',
+  qualifier: '予選',
+  race: '本番'
+};
+
+window.openStartFlowModal = function() {
+  haptic(10);
+  selectedTaskType = null;
+  selectedSessionContext = null;
+  document.querySelectorAll('.task-type-btn').forEach(b => b.classList.remove('selected'));
+  document.querySelectorAll('.context-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('flowChallenge').value = 5;
+  document.getElementById('flowChallengeVal').textContent = 5;
+  document.getElementById('flowSkill').value = 5;
+  document.getElementById('flowSkillVal').textContent = 5;
+  document.getElementById('flowPreActivity').value = '';
+  document.getElementById('flowEvent').value = '';
+  document.getElementById('competitionContextGroup').style.display = 'none';
+  document.getElementById('eventGroup').style.display = 'none';
+  document.getElementById('startFlowModal').classList.add('visible');
+};
+
+// Task type selection
+document.addEventListener('click', (e) => {
+  const btn = e.target.classList && e.target.classList.contains('task-type-btn') ? e.target : (e.target.closest && e.target.closest('.task-type-btn'));
+  if (btn && btn.dataset.tasktype) {
+    haptic(8);
+    selectedTaskType = btn.dataset.tasktype;
+    document.querySelectorAll('.task-type-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    // Show athlete fields for competition/training
+    const showAthlete = (selectedTaskType === 'competition' || selectedTaskType === 'training');
+    document.getElementById('competitionContextGroup').style.display = showAthlete ? 'block' : 'none';
+    document.getElementById('eventGroup').style.display = showAthlete ? 'block' : 'none';
+  }
+});
+
+// Session context selection
+document.addEventListener('click', (e) => {
+  const btn = e.target.classList && e.target.classList.contains('context-btn') ? e.target : (e.target.closest && e.target.closest('.context-btn'));
+  if (btn && btn.dataset.context) {
+    haptic(8);
+    selectedSessionContext = btn.dataset.context;
+    document.querySelectorAll('.context-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+  }
+});
+
+window.startFlowSession = function() {
+  if (!selectedTaskType) { alert('タスク種別を選択してください'); return; }
+
+  // Get geolocation if available
+  let location = null;
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => { activeFlowSession.location = { lat: pos.coords.latitude, lng: pos.coords.longitude }; },
+      () => {},
+      { timeout: 3000, maximumAge: 60000 }
+    );
+  }
+
+  activeFlowSession = {
+    startTime: Date.now(),
+    taskType: selectedTaskType,
+    sessionContext: selectedSessionContext,
+    event: document.getElementById('flowEvent').value.trim() || null,
+    challenge: parseInt(document.getElementById('flowChallenge').value),
+    skill: parseInt(document.getElementById('flowSkill').value),
+    preActivity: document.getElementById('flowPreActivity').value.trim() || null,
+    timeOfDay: new Date().toISOString(),
+    hourOfDay: new Date().getHours(),
+    dayOfWeek: new Date().getDay(),
+    location: null
+  };
+
+  closeModal('startFlowModal');
+  document.getElementById('flowSessionIdle').style.display = 'none';
+  document.getElementById('flowSessionActive').style.display = 'block';
+  document.getElementById('flowSessionStatus').textContent = 'IN SESSION';
+  document.getElementById('flowSessionStatus').classList.add('active');
+  document.getElementById('flowTimerTask').textContent = TASK_TYPE_LABELS[selectedTaskType].en;
+
+  // Start timer
+  updateFlowTimer();
+  flowTimerInterval = setInterval(updateFlowTimer, 1000);
+  haptic([20, 50, 20]);
+};
+
+function updateFlowTimer() {
+  if (!activeFlowSession) return;
+  const elapsed = Math.floor((Date.now() - activeFlowSession.startTime) / 1000);
+  const min = Math.floor(elapsed / 60);
+  const sec = elapsed % 60;
+  document.getElementById('flowTimerDisplay').textContent =
+    String(min).padStart(2, '0') + ':' + String(sec).padStart(2, '0');
+}
+
+window.endFlowSession = function() {
+  if (!activeFlowSession) return;
+  haptic(15);
+
+  if (flowTimerInterval) {
+    clearInterval(flowTimerInterval);
+    flowTimerInterval = null;
+  }
+
+  activeFlowSession.endTime = Date.now();
+  activeFlowSession.durationSec = Math.floor((activeFlowSession.endTime - activeFlowSession.startTime) / 1000);
+
+  // Show end modal
+  const min = Math.floor(activeFlowSession.durationSec / 60);
+  const sec = activeFlowSession.durationSec % 60;
+  document.getElementById('endFlowDuration').textContent =
+    String(min).padStart(2, '0') + ':' + String(sec).padStart(2, '0');
+
+  // Reset sliders
+  ['endFlowLevel', 'endTimeDistortion', 'endFocus', 'endOutcome'].forEach(id => {
+    document.getElementById(id).value = 5;
+    document.getElementById(id + 'Val').textContent = 5;
+  });
+  document.getElementById('endPerformanceMetric').value = '';
+  document.getElementById('endFlowNote').value = '';
+
+  document.getElementById('endFlowModal').classList.add('visible');
+};
+
+window.cancelFlowSession = function() {
+  if (!confirm('このセッションを破棄しますか?')) return;
+  activeFlowSession = null;
+  if (flowTimerInterval) clearInterval(flowTimerInterval);
+  flowTimerInterval = null;
+  closeModal('endFlowModal');
+  document.getElementById('flowSessionIdle').style.display = 'block';
+  document.getElementById('flowSessionActive').style.display = 'none';
+  document.getElementById('flowSessionStatus').textContent = 'READY';
+  document.getElementById('flowSessionStatus').classList.remove('active');
+};
+
+window.saveFlowSession = async function() {
+  if (!activeFlowSession) return;
+
+  const subjective = {
+    flowLevel: parseInt(document.getElementById('endFlowLevel').value),
+    timeDistortion: parseInt(document.getElementById('endTimeDistortion').value),
+    focus: parseInt(document.getElementById('endFocus').value)
+  };
+
+  const performance = {
+    outcome: parseInt(document.getElementById('endOutcome').value),
+    metric: document.getElementById('endPerformanceMetric').value.trim() || null
+  };
+
+  // Calculate composite scores
+  const subjectiveScore = Math.round((subjective.flowLevel + subjective.timeDistortion + subjective.focus) / 3 * 10);
+  const performanceScore = performance.outcome * 10;
+
+  // True Zone determination: both subjective and performance >= 70
+  const trueZone = (subjectiveScore >= 70 && performanceScore >= 70);
+
+  const sessionData = {
+    ...activeFlowSession,
+    subjective,
+    performance,
+    subjectiveScore,
+    performanceScore,
+    trueZone,
+    note: document.getElementById('endFlowNote').value.trim() || null,
+    createdAt: serverTimestamp(),
+    profileSnapshot: currentProfile ? {
+      age: calculateAge(currentProfile),
+      sex: currentProfile.sex || null,
+      occupation: currentProfile.occupation || null,
+      chronotype: currentProfile.chronotype || null
+    } : null
+  };
+
+  showLoading(true);
+  try {
+    const sessionsRef = collection(db, 'users', currentUser.uid, 'flowSessions');
+    await addDoc(sessionsRef, sessionData);
+
+    closeModal('endFlowModal');
+    document.getElementById('flowSessionIdle').style.display = 'block';
+    document.getElementById('flowSessionActive').style.display = 'none';
+    document.getElementById('flowSessionStatus').textContent = 'READY';
+    document.getElementById('flowSessionStatus').classList.remove('active');
+
+    activeFlowSession = null;
+    showLoading(false);
+    haptic([30, 50, 30]);
+
+    if (trueZone) {
+      celebrateTrueZone();
+    }
+
+    await loadFlowSessions();
+  } catch (error) {
+    showLoading(false);
+    alert('保存失敗: ' + error.message);
+  }
+};
+
+function celebrateTrueZone() {
+  const cel = document.getElementById('celebration');
+  document.getElementById('celebrationEmoji').textContent = '⚡';
+  document.getElementById('celebrationTitle').textContent = 'TRUE ZONE';
+  document.getElementById('celebrationSub').textContent = '主観×パフォーマンス両方が高いセッション';
+  cel.classList.add('active');
+  haptic([40, 80, 40, 80, 40]);
+  setTimeout(() => cel.classList.remove('active'), 2500);
+}
+
+async function loadFlowSessions() {
+  if (!currentUser) return;
+  try {
+    const q = query(collection(db, 'users', currentUser.uid, 'flowSessions'), orderBy('createdAt', 'desc'), limit(60));
+    const snap = await getDocs(q);
+    flowSessions = [];
+    snap.forEach(d => flowSessions.push({ id: d.id, ...d.data() }));
+    renderFlowStats();
+    renderFlowInsights();
+    renderFlowHistory();
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+function renderFlowStats() {
+  document.getElementById('flowStatCount').textContent = flowSessions.length;
+  if (flowSessions.length === 0) {
+    document.getElementById('flowStatZoneRate').textContent = '—';
+    document.getElementById('flowStatAvgMin').textContent = '—';
+    return;
+  }
+  const trueZoneCount = flowSessions.filter(s => s.trueZone).length;
+  const zoneRate = Math.round((trueZoneCount / flowSessions.length) * 100);
+  document.getElementById('flowStatZoneRate').textContent = zoneRate + '%';
+
+  const avgSec = flowSessions.reduce((sum, s) => sum + (s.durationSec || 0), 0) / flowSessions.length;
+  document.getElementById('flowStatAvgMin').textContent = Math.round(avgSec / 60);
+}
+
+function renderFlowInsights() {
+  const card = document.getElementById('flowInsightsCard');
+  const content = document.getElementById('flowInsightsContent');
+  if (flowSessions.length < 3) {
+    card.style.display = 'none';
+    return;
+  }
+  card.style.display = 'block';
+
+  // Calculate insights
+  const insights = [];
+
+  // Best time of day
+  const hourBuckets = {};
+  flowSessions.forEach(s => {
+    if (s.hourOfDay !== undefined) {
+      const bucket = s.hourOfDay < 6 ? '深夜' : s.hourOfDay < 12 ? '午前' : s.hourOfDay < 18 ? '午後' : '夜';
+      if (!hourBuckets[bucket]) hourBuckets[bucket] = { total: 0, zone: 0 };
+      hourBuckets[bucket].total++;
+      if (s.trueZone) hourBuckets[bucket].zone++;
+    }
+  });
+  let bestBucket = null, bestRate = 0;
+  for (const [k, v] of Object.entries(hourBuckets)) {
+    if (v.total >= 2) {
+      const rate = v.zone / v.total;
+      if (rate > bestRate) { bestRate = rate; bestBucket = k; }
+    }
+  }
+  if (bestBucket && bestRate > 0) {
+    insights.push(`<strong style="color: var(--brand-cyan);">${bestBucket}</strong>のゾーン率が最も高い(${Math.round(bestRate * 100)}%)`);
+  }
+
+  // Best task type
+  const taskBuckets = {};
+  flowSessions.forEach(s => {
+    if (!taskBuckets[s.taskType]) taskBuckets[s.taskType] = { total: 0, zone: 0 };
+    taskBuckets[s.taskType].total++;
+    if (s.trueZone) taskBuckets[s.taskType].zone++;
+  });
+  let bestTask = null, bestTaskRate = 0;
+  for (const [k, v] of Object.entries(taskBuckets)) {
+    if (v.total >= 2) {
+      const rate = v.zone / v.total;
+      if (rate > bestTaskRate) { bestTaskRate = rate; bestTask = k; }
+    }
+  }
+  if (bestTask && bestTaskRate > 0) {
+    insights.push(`タスク種別「<strong style="color: var(--brand-pink);">${TASK_TYPE_LABELS[bestTask].label}</strong>」が最高ゾーン率(${Math.round(bestTaskRate * 100)}%)`);
+  }
+
+  // Challenge-Skill balance
+  const balanced = flowSessions.filter(s => Math.abs(s.challenge - s.skill) <= 1);
+  if (balanced.length >= 3) {
+    const balZone = balanced.filter(s => s.trueZone).length / balanced.length;
+    insights.push(`難度とスキルが拮抗時のゾーン率: <strong style="color: var(--brand-purple);">${Math.round(balZone * 100)}%</strong>`);
+  }
+
+  if (insights.length === 0) {
+    insights.push('もう少しデータが溜まると、状況間再現性のパターンが見えてきます');
+  }
+
+  content.innerHTML = insights.map(i => `<div style="margin-bottom: 8px;">• ${i}</div>`).join('');
+}
+
+function renderFlowHistory() {
+  const list = document.getElementById('flowHistoryList');
+  if (flowSessions.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⚡</div>まだセッションがありません<div class="empty-state-sub">最初のFlow Sessionから始めましょう</div></div>';
+    return;
+  }
+  list.innerHTML = flowSessions.map(s => {
+    const date = s.createdAt && s.createdAt.toDate ? s.createdAt.toDate() : new Date(s.timeOfDay);
+    const dateStr = `${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+    const min = Math.floor((s.durationSec || 0) / 60);
+    const taskLabel = TASK_TYPE_LABELS[s.taskType] ? TASK_TYPE_LABELS[s.taskType].label : s.taskType;
+    const contextLabel = s.sessionContext && SESSION_CONTEXT_LABELS[s.sessionContext] ? `· ${SESSION_CONTEXT_LABELS[s.sessionContext]}` : '';
+    const eventLabel = s.event ? ` · ${escapeHtml(s.event)}` : '';
+    const trueZoneBadge = s.trueZone ? '<span class="true-zone-badge">⚡ TRUE ZONE</span>' : '';
+
+    return `<div class="flow-session-history">
+      <div class="flow-history-top">
+        <div>
+          <div class="flow-history-task">${taskLabel}${eventLabel}</div>
+          <div class="flow-history-meta">${dateStr} · ${min}分 ${contextLabel}</div>
+        </div>
+        ${trueZoneBadge}
+      </div>
+      <div class="flow-history-scores">
+        <div class="flow-score-block">
+          <div class="flow-score-label">主観 A</div>
+          <div class="flow-score-value subjective">${s.subjectiveScore || '—'}</div>
+        </div>
+        <div class="flow-score-block">
+          <div class="flow-score-label">成果 C</div>
+          <div class="flow-score-value performance">${s.performanceScore || '—'}</div>
+        </div>
+        <div class="flow-score-block">
+          <div class="flow-score-label">時間</div>
+          <div class="flow-score-value duration">${min}m</div>
+        </div>
+      </div>
+      ${s.note ? `<div style="font-size: 11px; color: var(--text-tertiary); margin-top: 8px; line-height: 1.6;">📝 ${escapeHtml(s.note)}</div>` : ''}
+      ${s.performance && s.performance.metric ? `<div style="font-size: 11px; color: var(--brand-cyan); margin-top: 4px; font-family: 'JetBrains Mono', monospace;">📊 ${escapeHtml(s.performance.metric)}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+// ========================================
+// COMPUTE & SAVE
+// ========================================
+window.compute = async function() {
+  haptic(15);
+  const input = {
+    sleep_hours: parseFloat(document.getElementById('sleepHours').value) || 0,
+    hrv_rmssd: parseFloat(document.getElementById('hrvRmssd').value) || 0,
+    clarity: parseInt(document.getElementById('clarity').value),
+    mood: parseInt(document.getElementById('mood').value),
+    flow: parseInt(document.getElementById('flow').value),
+    fatigue: parseInt(document.getElementById('fatigue').value),
+    note: document.getElementById('noteInput').value.trim()
+  };
+
+  const result = calculateHOS(input, currentProfile);
+  animateScore(result.total);
+  document.getElementById('hosState').textContent = result.state_label;
+  document.getElementById('hosRecommendation').textContent = result.recommendation;
+  renderBreakdown(result.indicators);
+
+  showStatus('保存中...', '');
+  try {
+    const recordsRef = collection(db, 'users', currentUser.uid, 'hosRecords');
+    await addDoc(recordsRef, {
+      date: new Date().toISOString(),
+      sleep_hours: input.sleep_hours,
+      hrv_rmssd: input.hrv_rmssd,
+      clarity: input.clarity,
+      mood: input.mood,
+      flow: input.flow,
+      fatigue: input.fatigue,
+      note: input.note,
+      hosTotal: result.total,
+      stateLabel: result.state_label,
+      indicators: {
+        sleep: result.indicators.sleep.score, hrv: result.indicators.hrv.score,
+        clarity: result.indicators.clarity.score, mood: result.indicators.mood.score,
+        flow: result.indicators.flow.score, fatigue: result.indicators.fatigue.score
+      },
+      profileSnapshot: currentProfile ? {
+        age: calculateAge(currentProfile),
+        sex: currentProfile.sex || null,
+        occupation: currentProfile.occupation || null,
+        chronotype: currentProfile.chronotype || null,
+        hrvBaseline: getHRVBaseline(currentProfile),
+        sleepBaseline: getSleepBaseline(currentProfile)
+      } : null,
+      createdAt: serverTimestamp()
+    });
+
+    for (const groupId of myGroups.map(g => g.id)) {
+      await setDoc(doc(db, 'groupSnapshots', groupId, 'latest', currentUser.uid), {
+        userId: currentUser.uid,
+        hosTotal: result.total,
+        stateLabel: result.state_label,
+        recordedAt: serverTimestamp()
+      });
+    }
+
+    showStatus('✓ クラウドに保存しました', 'success');
+    await loadHistory();
+    haptic([20, 50, 20]);
+  } catch (error) {
+    showStatus('保存失敗: ' + error.message, 'error');
+  }
+};
+
+function animateScore(target) {
+  const el = document.getElementById('hosScore');
+  const current = parseInt(el.textContent) || 0;
+  const start = performance.now();
+  const dur = 1000;
+  function step(now) {
+    const p = Math.min((now - start) / dur, 1);
+    const eased = 1 - Math.pow(1 - p, 3);
+    el.textContent = Math.round(current + (target - current) * eased);
+    if (p < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+function renderBreakdown(ind) {
+  const labels = { sleep: 'SLEEP', hrv: 'HRV', clarity: 'CLARITY', mood: 'MOOD', flow: 'FLOW', fatigue: 'ENERGY' };
+  const order = ['sleep', 'hrv', 'clarity', 'mood', 'flow', 'fatigue'];
+  document.getElementById('breakdownContent').innerHTML = order.map((k, i) => `
+    <div class="breakdown-row">
+      <div class="breakdown-label">${labels[k]}</div>
+      <div class="breakdown-bar-bg"><div class="breakdown-bar-fill" style="width: 0%" data-target="${ind[k].score}"></div></div>
+      <div class="breakdown-score">${Math.round(ind[k].score)}</div>
+    </div>
+  `).join('');
+  document.getElementById('indicatorBreakdown').classList.add('visible');
+  // Animate bars
+  setTimeout(() => {
+    document.querySelectorAll('.breakdown-bar-fill').forEach(bar => {
+      bar.style.width = bar.dataset.target + '%';
+    });
+  }, 50);
+}
+
+// ========================================
+// HISTORY & STATS
+// ========================================
+async function loadHistory() {
+  if (!currentUser) return;
+  try {
+    const q = query(collection(db, 'users', currentUser.uid, 'hosRecords'), orderBy('createdAt', 'desc'), limit(60));
+    const snap = await getDocs(q);
+    const list = document.getElementById('historyList');
+
+    historyRecords = [];
+    snap.forEach(d => historyRecords.push({ id: d.id, ...d.data() }));
+
+    updateStats();
+    updateStreak();
+    updateTrend();
+
+    if (historyRecords.length === 0) {
+      list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📊</div>まだ記録がありません<div class="empty-state-sub">最初のHOS測定から始めましょう</div></div>';
+      return;
+    }
+
+    let html = '';
+    let dayNum = historyRecords.length;
+    historyRecords.forEach((r) => {
+      const date = new Date(r.date);
+      const dateStr = `${String(date.getMonth()+1).padStart(2,'0')}/${String(date.getDate()).padStart(2,'0')} ${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}`;
+      const notePreview = r.note ? `<div class="history-note-preview">📝 ${escapeHtml(r.note)}</div>` : '';
+      html += `<div class="history-row" id="hist-${r.id}">
+        <div class="history-row-content" onclick="toggleHistoryRow('${r.id}')">
+          <div class="history-meta">
+            <div class="history-date">${dateStr} · DAY ${dayNum}</div>
+            <div class="history-state">${r.stateLabel}</div>
+            ${notePreview}
+          </div>
+          <div class="history-score">${r.hosTotal}</div>
+        </div>
+        <div class="history-actions">
+          <button class="history-action-btn" onclick="event.stopPropagation(); openEditModal('${r.id}')">✏️ 編集</button>
+          <button class="history-action-btn delete" onclick="event.stopPropagation(); openDeleteModal('${r.id}')">🗑️ 削除</button>
+        </div>
+      </div>`;
+      dayNum--;
+    });
+    list.innerHTML = html;
+  } catch (error) { console.error(error); }
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function updateStats() {
+  if (historyRecords.length === 0) {
+    document.getElementById('statAvg').textContent = '—';
+    document.getElementById('statBest').textContent = '—';
+    document.getElementById('statCount').textContent = '0';
+    return;
+  }
+  const scores = historyRecords.map(r => r.hosTotal);
+  const avg = Math.round(scores.reduce((a,b) => a+b, 0) / scores.length);
+  const best = Math.max(...scores);
+  document.getElementById('statAvg').textContent = avg;
+  document.getElementById('statBest').textContent = best;
+  document.getElementById('statCount').textContent = historyRecords.length;
+}
+
+function updateStreak() {
+  const badge = document.getElementById('streakBadge');
+  const daysEl = document.getElementById('streakDays');
+
+  if (historyRecords.length === 0) {
+    daysEl.textContent = '0';
+    badge.classList.add('zero');
+    return;
+  }
+
+  // Calculate consecutive days from today backward
+  const dayKeys = new Set();
+  historyRecords.forEach(r => {
+    const d = new Date(r.date);
+    dayKeys.add(`${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`);
+  });
+
+  let streak = 0;
+  const today = new Date();
+  for (let i = 0; i < 365; i++) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+    if (dayKeys.has(key)) {
+      streak++;
+    } else if (i === 0) {
+      // Today not yet recorded - check yesterday continuity
+      continue;
+    } else {
+      break;
+    }
+  }
+
+  daysEl.textContent = streak;
+  badge.classList.toggle('zero', streak === 0);
+
+  // Celebrate milestones
+  const previousStreak = parseInt(localStorage.getItem('neusen_last_streak') || '0');
+  if (streak > previousStreak) {
+    if (streak === 7 || streak === 30 || streak === 100 || streak === 365) {
+      celebrate(streak);
+    }
+  }
+  localStorage.setItem('neusen_last_streak', String(streak));
+}
+
+function updateTrend() {
+  const trendEl = document.getElementById('hosTrend');
+  const labelEl = document.getElementById('trendLabel');
+
+  if (historyRecords.length === 0) {
+    trendEl.innerHTML = '';
+    labelEl.style.display = 'none';
+    return;
+  }
+
+  // Last 7 records
+  const recent = [...historyRecords].slice(0, 7).reverse();
+  const maxScore = 100;
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}-${today.getMonth()}-${today.getDate()}`;
+
+  let html = '';
+  recent.forEach(r => {
+    const h = (r.hosTotal / maxScore) * 100;
+    const d = new Date(r.date);
+    const dStr = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+    const isToday = dStr === todayStr;
+    html += `<div class="trend-bar ${isToday ? 'today' : ''}" style="height: ${h}%"></div>`;
+  });
+
+  // Pad with empty bars if less than 7
+  for (let i = recent.length; i < 7; i++) {
+    html += '<div class="trend-bar empty" style="height: 8%"></div>';
+  }
+
+  trendEl.innerHTML = html;
+  labelEl.style.display = 'block';
+}
+
+function celebrate(streak) {
+  const cel = document.getElementById('celebration');
+  const emoji = streak >= 100 ? '🏆' : streak >= 30 ? '⭐' : '🔥';
+  document.getElementById('celebrationEmoji').textContent = emoji;
+  document.getElementById('celebrationTitle').textContent = `Streak Day ${streak}`;
+  document.getElementById('celebrationSub').textContent = `${streak}日連続記録達成!`;
+  cel.classList.add('active');
+  haptic([30, 50, 30, 50, 30]);
+  setTimeout(() => cel.classList.remove('active'), 2500);
+}
+
+// ========================================
+// HISTORY ROW INTERACTIONS
+// ========================================
+window.toggleHistoryRow = function(id) {
+  haptic(8);
+  const row = document.getElementById('hist-' + id);
+  document.querySelectorAll('.history-row').forEach(r => {
+    if (r.id !== 'hist-' + id) r.classList.remove('expanded');
+  });
+  row.classList.toggle('expanded');
+};
+
+window.openEditModal = function(id) {
+  const record = historyRecords.find(r => r.id === id);
+  if (!record) return;
+  editingRecordId = id;
+
+  const date = new Date(record.date);
+  document.getElementById('editRecordDate').textContent =
+    `${date.getFullYear()}/${date.getMonth()+1}/${date.getDate()} ${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}`;
+
+  document.getElementById('editSleep').value = record.sleep_hours;
+  document.getElementById('editHrv').value = record.hrv_rmssd;
+  document.getElementById('editClarity').value = record.clarity;
+  document.getElementById('editClarityVal').textContent = record.clarity;
+  document.getElementById('editMood').value = record.mood;
+  document.getElementById('editMoodVal').textContent = record.mood;
+  document.getElementById('editFlow').value = record.flow;
+  document.getElementById('editFlowVal').textContent = record.flow;
+  document.getElementById('editFatigue').value = record.fatigue;
+  document.getElementById('editFatigueVal').textContent = record.fatigue;
+  document.getElementById('editNote').value = record.note || '';
+
+  document.getElementById('editModal').classList.add('visible');
+};
+
+window.saveEditedRecord = async function() {
+  if (!editingRecordId) return;
+
+  const input = {
+    sleep_hours: parseFloat(document.getElementById('editSleep').value) || 0,
+    hrv_rmssd: parseFloat(document.getElementById('editHrv').value) || 0,
+    clarity: parseInt(document.getElementById('editClarity').value),
+    mood: parseInt(document.getElementById('editMood').value),
+    flow: parseInt(document.getElementById('editFlow').value),
+    fatigue: parseInt(document.getElementById('editFatigue').value),
+    note: document.getElementById('editNote').value.trim()
+  };
+
+  const result = calculateHOS(input, currentProfile);
+
+  showLoading(true);
+  try {
+    const recordRef = doc(db, 'users', currentUser.uid, 'hosRecords', editingRecordId);
+    await updateDoc(recordRef, {
+      sleep_hours: input.sleep_hours,
+      hrv_rmssd: input.hrv_rmssd,
+      clarity: input.clarity,
+      mood: input.mood,
+      flow: input.flow,
+      fatigue: input.fatigue,
+      note: input.note,
+      hosTotal: result.total,
+      stateLabel: result.state_label,
+      indicators: {
+        sleep: result.indicators.sleep.score, hrv: result.indicators.hrv.score,
+        clarity: result.indicators.clarity.score, mood: result.indicators.mood.score,
+        flow: result.indicators.flow.score, fatigue: result.indicators.fatigue.score
+      },
+      editedAt: serverTimestamp()
+    });
+
+    // Update group snapshots if this was the latest record
+    if (historyRecords[0] && historyRecords[0].id === editingRecordId) {
+      for (const groupId of myGroups.map(g => g.id)) {
+        await setDoc(doc(db, 'groupSnapshots', groupId, 'latest', currentUser.uid), {
+          userId: currentUser.uid,
+          hosTotal: result.total,
+          stateLabel: result.state_label,
+          recordedAt: serverTimestamp()
+        });
+      }
+    }
+
+    closeModal('editModal');
+    editingRecordId = null;
+    await loadHistory();
+    showLoading(false);
+    haptic(20);
+  } catch (error) {
+    showLoading(false);
+    alert('編集失敗: ' + error.message);
+  }
+};
+
+window.openDeleteModal = function(id) {
+  const record = historyRecords.find(r => r.id === id);
+  if (!record) return;
+  deletingRecordId = id;
+
+  const date = new Date(record.date);
+  document.getElementById('deleteRecordPreview').innerHTML = `
+    <div style="color: var(--text-tertiary); font-size: 11px; font-family: 'JetBrains Mono', monospace;">
+      ${date.getFullYear()}/${date.getMonth()+1}/${date.getDate()} ${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}
+    </div>
+    <div style="margin-top: 8px; display: flex; align-items: baseline; gap: 12px;">
+      <span style="font-family: 'Space Grotesk'; font-size: 28px; font-weight: 700; background: linear-gradient(135deg, var(--brand-cyan), var(--brand-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">${record.hosTotal}</span>
+      <span style="font-family: 'JetBrains Mono'; font-size: 11px; color: var(--brand-cyan); letter-spacing: 0.1em;">${record.stateLabel}</span>
+    </div>
+  `;
+
+  document.getElementById('deleteModal').classList.add('visible');
+};
+
+window.confirmDeleteRecord = async function() {
+  if (!deletingRecordId) return;
+
+  showLoading(true);
+  try {
+    await deleteDoc(doc(db, 'users', currentUser.uid, 'hosRecords', deletingRecordId));
+    closeModal('deleteModal');
+    deletingRecordId = null;
+    await loadHistory();
+    showLoading(false);
+    haptic([10, 30, 10]);
+  } catch (error) {
+    showLoading(false);
+    alert('削除失敗: ' + error.message);
+  }
+};
+
+// ========================================
+// GROUPS
+// ========================================
+function generateInviteCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code = '';
+  for (let i = 0; i < 6; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+  return code;
+}
+
+window.openCreateGroupModal = function() {
+  document.getElementById('newGroupName').value = '';
+  document.getElementById('cohortStartDate').value = '';
+  document.getElementById('cohortEndDate').value = '';
+  document.getElementById('cohortLocation').value = '';
+  document.getElementById('cohortDescription').value = '';
+  // Reset cohort type to longterm
+  document.getElementById('cohortTypeLongterm').classList.add('selected');
+  document.getElementById('cohortTypeEvent').classList.remove('selected');
+  document.getElementById('eventDateFields').style.display = 'none';
+  selectedCohortType = 'longterm';
+  document.getElementById('createGroupModal').classList.add('visible');
+};
+
+let selectedCohortType = 'longterm';
+
+// Cohort type selection
+document.addEventListener('click', (e) => {
+  const btn = e.target.classList && e.target.classList.contains('task-type-btn') ? e.target : (e.target.closest && e.target.closest('.task-type-btn'));
+  if (btn && btn.dataset.cohorttype) {
+    haptic(8);
+    selectedCohortType = btn.dataset.cohorttype;
+    document.querySelectorAll('[data-cohorttype]').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    document.getElementById('eventDateFields').style.display =
+      selectedCohortType === 'event' ? 'block' : 'none';
+    // Pre-fill event date defaults
+    if (selectedCohortType === 'event' && !document.getElementById('cohortStartDate').value) {
+      const today = new Date();
+      const monthLater = new Date();
+      monthLater.setDate(monthLater.getDate() + 30);
+      document.getElementById('cohortStartDate').value = today.toISOString().split('T')[0];
+      document.getElementById('cohortEndDate').value = monthLater.toISOString().split('T')[0];
+    }
+  }
+});
+
+window.openJoinGroupModal = function(prefilledCode = null) {
+  const codeToUse = (prefilledCode && typeof prefilledCode === 'string') ? prefilledCode : '';
+  document.getElementById('inviteCodeInput').value = codeToUse;
+  document.getElementById('nicknameInput').style.display = 'none';
+  document.getElementById('joinGroupModal').classList.add('visible');
+};
+
+// Setup nickname toggle once
+document.addEventListener('change', (e) => {
+  if (e.target.name === 'myDisplay') {
+    document.getElementById('nicknameInput').style.display = e.target.value === 'anonymous' ? 'block' : 'none';
+  }
+  if (e.target.name === 'updateDisplay') {
+    document.getElementById('updateNickname').style.display = e.target.value === 'anonymous' ? 'block' : 'none';
+  }
+  // Update sharing option visual state
+  if (e.target.name === 'dataLevel' || e.target.name === 'updateDataLevel') {
+    document.querySelectorAll(`input[name="${e.target.name}"]`).forEach(input => {
+      const label = input.closest('.sharing-option');
+      if (label) label.classList.toggle('selected', input.checked);
+    });
+  }
+});
+
+window.closeModal = function(id) {
+  document.getElementById(id).classList.remove('visible');
+};
+
+window.createGroup = async function() {
+  const name = document.getElementById('newGroupName').value.trim();
+  if (!name) { alert('コホート名を入力してください'); return; }
+
+  const visibility = document.querySelector('input[name="visibility"]:checked').value;
+  const inviteCode = generateInviteCode();
+
+  const cohortData = {
+    name,
+    createdBy: currentUser.uid,
+    inviteCode,
+    visibilityMode: visibility,
+    cohortType: selectedCohortType,
+    createdAt: serverTimestamp(),
+    memberCount: 1
+  };
+
+  if (selectedCohortType === 'event') {
+    const startDate = document.getElementById('cohortStartDate').value;
+    const endDate = document.getElementById('cohortEndDate').value;
+    if (!startDate || !endDate) { alert('開始日・終了日を入力してください'); return; }
+    cohortData.startDate = startDate;
+    cohortData.endDate = endDate;
+    cohortData.location = document.getElementById('cohortLocation').value.trim() || null;
+    cohortData.description = document.getElementById('cohortDescription').value.trim() || null;
+  }
+
+  showLoading(true);
+  try {
+    const groupRef = await addDoc(collection(db, 'groups'), cohortData);
+
+    await setDoc(doc(db, 'groups', groupRef.id, 'members', currentUser.uid), {
+      userId: currentUser.uid,
+      displayName: currentUser.displayName,
+      role: 'admin',
+      displayPreference: visibility, // default to cohort default
+      dataLevel: 'stats',
+      joinedAt: serverTimestamp()
+    });
+
+    showLoading(false);
+    closeModal('createGroupModal');
+    haptic([20, 50, 20]);
+    alert(`「${name}」を作成しました\n招待コード: ${inviteCode}`);
+    await loadMyGroups();
+  } catch (error) {
+    showLoading(false);
+    alert('作成失敗: ' + error.message);
+  }
+};
+
+window.joinGroup = async function() {
+  const code = document.getElementById('inviteCodeInput').value.trim().toUpperCase();
+  if (code.length !== 6) { alert('6文字の招待コードを入力してください'); return; }
+
+  const display = document.querySelector('input[name="myDisplay"]:checked').value;
+  const nickname = document.getElementById('nicknameInput').value.trim();
+  if (display === 'anonymous' && !nickname) { alert('ニックネームを入力してください'); return; }
+
+  const dataLevel = document.querySelector('input[name="dataLevel"]:checked').value;
+
+  showLoading(true);
+  try {
+    const q = query(collection(db, 'groups'), where('inviteCode', '==', code), limit(1));
+    const snap = await getDocs(q);
+    if (snap.empty) { showLoading(false); alert('招待コードが見つかりません'); return; }
+
+    const groupDoc = snap.docs[0];
+    const memberRef = doc(db, 'groups', groupDoc.id, 'members', currentUser.uid);
+    const memberSnap = await getDoc(memberRef);
+    if (memberSnap.exists()) { showLoading(false); alert('既に参加済みです'); return; }
+
+    await setDoc(memberRef, {
+      userId: currentUser.uid,
+      displayName: display === 'real' ? currentUser.displayName : (display === 'anonymous' ? nickname : 'Hidden'),
+      role: 'member',
+      displayPreference: display,
+      dataLevel,
+      joinedAt: serverTimestamp()
+    });
+
+    showLoading(false);
+    closeModal('joinGroupModal');
+    haptic([20, 50, 20]);
+    alert(`「${groupDoc.data().name}」に参加しました`);
+    await loadMyGroups();
+  } catch (error) {
+    showLoading(false);
+    alert('参加失敗: ' + error.message);
+  }
+};
+
+async function loadMyGroups() {
+  if (!currentUser) return;
+  try {
+    const allGroups = await getDocs(collection(db, 'groups'));
+    myGroups = [];
+    for (const g of allGroups.docs) {
+      const memberSnap = await getDoc(doc(db, 'groups', g.id, 'members', currentUser.uid));
+      if (memberSnap.exists()) {
+        myGroups.push({ id: g.id, ...g.data(), myMembership: memberSnap.data() });
+      }
+    }
+    renderGroupList();
+  } catch (error) { console.error(error); }
+}
+
+function getCohortStatus(cohort) {
+  if (cohort.cohortType !== 'event') return { state: 'longterm', label: 'ACTIVE' };
+  if (!cohort.startDate || !cohort.endDate) return { state: 'longterm', label: 'ACTIVE' };
+  const today = new Date().toISOString().split('T')[0];
+  if (today < cohort.startDate) {
+    const days = Math.ceil((new Date(cohort.startDate) - new Date(today)) / 86400000);
+    return { state: 'upcoming', label: `あと${days}日`, days };
+  }
+  if (today > cohort.endDate) {
+    return { state: 'ended', label: '終了' };
+  }
+  const totalDays = Math.ceil((new Date(cohort.endDate) - new Date(cohort.startDate)) / 86400000) + 1;
+  const dayNum = Math.ceil((new Date(today) - new Date(cohort.startDate)) / 86400000) + 1;
+  return { state: 'active', label: `Day ${dayNum} / ${totalDays}` };
+}
+
+function renderGroupList() {
+  const list = document.getElementById('groupList');
+  if (myGroups.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🌐</div>まだコホートに参加していません<div class="empty-state-sub">研究コホートまたはイベントコホートに参加</div></div>';
+    return;
+  }
+  list.innerHTML = myGroups.map(g => {
+    const isEvent = g.cohortType === 'event';
+    const status = getCohortStatus(g);
+    const typeBadge = isEvent
+      ? '<div class="cohort-type-badge event">EVENT</div>'
+      : '<div class="cohort-type-badge longterm">LONGTERM</div>';
+    const periodInfo = isEvent && g.startDate ? `
+      <div class="cohort-period">
+        <span class="cohort-status-dot ${status.state}"></span>
+        ${g.startDate} ~ ${g.endDate} · <strong style="color: var(--brand-cyan); font-family: 'JetBrains Mono', monospace;">${status.label}</strong>
+        ${g.location ? ' · 📍 ' + escapeHtml(g.location) : ''}
+      </div>
+    ` : '';
+    return `
+      <div class="cohort-card ${isEvent ? 'event' : ''}" onclick="selectGroup('${g.id}')">
+        <div class="cohort-card-header">
+          <div class="cohort-name">${escapeHtml(g.name)}</div>
+          ${typeBadge}
+        </div>
+        <div class="cohort-meta-row">
+          <span>👥 <strong>${g.memberCount || 1}</strong></span>
+          <span>🔑 <strong style="color: var(--brand-cyan); font-family: 'JetBrains Mono', monospace; font-size: 11px;">${g.inviteCode}</strong></span>
+        </div>
+        ${periodInfo}
+      </div>
+    `;
+  }).join('');
+}
+
+window.selectGroup = async function(groupId) {
+  haptic(8);
+  currentGroupId = groupId;
+  const group = myGroups.find(g => g.id === groupId);
+  if (!group) return;
+  document.getElementById('currentGroupTitle').textContent = group.name;
+  document.getElementById('groupDetailSection').style.display = 'block';
+  document.getElementById('sharingSettingsBtn').style.display = 'block';
+
+  // Show cohort status card
+  const statusCard = document.getElementById('cohortStatusCard');
+  if (group.cohortType === 'event' && group.startDate) {
+    const status = getCohortStatus(group);
+    statusCard.style.display = 'block';
+    statusCard.innerHTML = `
+      <div class="cohort-card event" style="cursor: default;">
+        <div class="cohort-meta-row" style="margin-top: 0;">
+          <span><span class="cohort-status-dot ${status.state}"></span>${status.label}</span>
+          ${group.location ? `<span>📍 ${escapeHtml(group.location)}</span>` : ''}
+        </div>
+        ${group.description ? `<div style="font-size: 12px; color: var(--text-tertiary); margin-top: 8px; line-height: 1.6;">${escapeHtml(group.description)}</div>` : ''}
+      </div>
+    `;
+  } else {
+    statusCard.style.display = 'none';
+  }
+
+  showLoading(true);
+  try {
+    const membersSnap = await getDocs(collection(db, 'groups', groupId, 'members'));
+    const members = [];
+    const today = new Date();
+    const todayKey = `${today.getFullYear()}-${today.getMonth()}-${today.getDate()}`;
+
+    for (const m of membersSnap.docs) {
+      const member = m.data();
+      const snapDoc = await getDoc(doc(db, 'groupSnapshots', groupId, 'latest', m.id));
+      const hos = snapDoc.exists() ? snapDoc.data() : null;
+      let recordedToday = false;
+      if (hos && hos.recordedAt) {
+        const recDate = hos.recordedAt.toDate ? hos.recordedAt.toDate() : new Date(hos.recordedAt);
+        recordedToday = `${recDate.getFullYear()}-${recDate.getMonth()}-${recDate.getDate()}` === todayKey;
+      }
+      members.push({ id: m.id, ...member, hos, recordedToday });
+    }
+
+    // Filter out hidden members (except yourself)
+    const visibleMembers = members.filter(m => m.displayPreference !== 'hidden' || m.userId === currentUser.uid);
+
+    // Render insights
+    renderCohortInsights(visibleMembers);
+
+    // Render leaderboard
+    renderLeaderboard(visibleMembers, groupId);
+
+  } catch (error) { console.error(error); }
+  showLoading(false);
+};
+
+function renderCohortInsights(members) {
+  const card = document.getElementById('cohortInsightsCard');
+  const withHos = members.filter(m => m.hos && m.hos.hosTotal !== undefined);
+  if (withHos.length < 2) {
+    card.style.display = 'none';
+    return;
+  }
+  card.style.display = 'block';
+
+  const scores = withHos.map(m => m.hos.hosTotal);
+  const avg = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
+  const max = Math.max(...scores);
+  const recordedToday = members.filter(m => m.recordedToday).length;
+
+  // My rank
+  const sorted = [...withHos].sort((a, b) => b.hos.hosTotal - a.hos.hosTotal);
+  const myIndex = sorted.findIndex(m => m.userId === currentUser.uid);
+  const myRank = myIndex >= 0 ? myIndex + 1 : null;
+
+  card.innerHTML = `
+    <div class="cohort-insights">
+      <div class="profile-card-title" style="margin-bottom: 10px;">COHORT INSIGHTS · 集計</div>
+      <div class="cohort-insight-row">
+        <span class="cohort-insight-label">平均HOS</span>
+        <span class="cohort-insight-value">${avg}</span>
+      </div>
+      <div class="cohort-insight-row">
+        <span class="cohort-insight-label">最高HOS</span>
+        <span class="cohort-insight-value">${max}</span>
+      </div>
+      <div class="cohort-insight-row">
+        <span class="cohort-insight-label">今日記録済み</span>
+        <span class="cohort-insight-value">${recordedToday} / ${members.length}人</span>
+      </div>
+      ${myRank ? `<div class="cohort-insight-row">
+        <span class="cohort-insight-label">あなたの順位</span>
+        <span class="cohort-insight-value">${myRank} / ${sorted.length}位</span>
+      </div>` : ''}
+    </div>
+  `;
+}
+
+function renderLeaderboard(members, groupId) {
+  const list = document.getElementById('memberList');
+  const withHos = members.filter(m => m.hos && m.hos.hosTotal !== undefined);
+  const withoutHos = members.filter(m => !m.hos || m.hos.hosTotal === undefined);
+  const sorted = [...withHos].sort((a, b) => b.hos.hosTotal - a.hos.hosTotal);
+  const ordered = [...sorted, ...withoutHos];
+
+  if (ordered.length === 0) {
+    list.innerHTML = '<div class="leaderboard-empty">メンバーがいません</div>';
+    return;
+  }
+
+  let html = '<div class="leaderboard">';
+  ordered.forEach((m, idx) => {
+    const isYou = m.userId === currentUser.uid;
+    const displayName = (m.displayPreference === 'hidden' && isYou)
+      ? `${m.displayName || 'You'} (非公開)`
+      : (m.displayName || 'Anonymous');
+    const isAnon = m.displayPreference === 'anonymous';
+
+    let rankClass = '';
+    if (m.hos) {
+      if (idx === 0) rankClass = 'top1';
+      else if (idx === 1) rankClass = 'top2';
+      else if (idx === 2) rankClass = 'top3';
+    }
+
+    const trendIcon = m.recordedToday ? '<span style="color: var(--brand-mint);">●</span>' : '<span style="color: var(--text-faint);">○</span>';
+
+    html += `<div class="leaderboard-row ${isYou ? 'you' : ''}" onclick="openMemberDetail('${groupId}', '${m.userId}')">
+      <div class="leaderboard-rank ${rankClass}">${m.hos ? (idx + 1) : '—'}</div>
+      <div class="leaderboard-name">${isYou ? '👤 ' : ''}${escapeHtml(displayName)}${isAnon ? '<span class="leaderboard-anon-badge">ANON</span>' : ''}</div>
+      <div class="leaderboard-score">${m.hos ? m.hos.hosTotal : '—'}</div>
+      <div class="leaderboard-trend">${trendIcon}</div>
+    </div>`;
+  });
+  html += '</div>';
+  list.innerHTML = html;
+}
+
+window.openMemberDetail = async function(groupId, userId) {
+  haptic(8);
+  const modal = document.getElementById('memberDetailModal');
+  const title = document.getElementById('memberDetailTitle');
+  const content = document.getElementById('memberDetailContent');
+  modal.classList.add('visible');
+  content.innerHTML = '<div class="member-data-restricted">読み込み中...</div>';
+
+  try {
+    const memberSnap = await getDoc(doc(db, 'groups', groupId, 'members', userId));
+    if (!memberSnap.exists()) {
+      content.innerHTML = '<div class="member-data-restricted">メンバーが見つかりません</div>';
+      return;
+    }
+    const member = memberSnap.data();
+    const isYou = userId === currentUser.uid;
+    const displayName = (member.displayPreference === 'hidden' && !isYou)
+      ? '非公開メンバー'
+      : (member.displayName || 'Anonymous');
+    title.textContent = displayName;
+
+    // Hidden members - cannot view
+    if (member.displayPreference === 'hidden' && !isYou) {
+      content.innerHTML = '<div class="member-data-restricted">このメンバーは非公開設定です</div>';
+      return;
+    }
+
+    // Get latest HOS snapshot
+    const snapDoc = await getDoc(doc(db, 'groupSnapshots', groupId, 'latest', userId));
+    const hos = snapDoc.exists() ? snapDoc.data() : null;
+
+    // Get recent history (only if dataLevel allows)
+    let recentRecords = [];
+    if (member.dataLevel === 'stats' || member.dataLevel === 'full' || isYou) {
+      try {
+        const recordsQ = query(
+          collection(db, 'users', userId, 'hosRecords'),
+          orderBy('createdAt', 'desc'),
+          limit(7)
+        );
+        const recordsSnap = await getDocs(recordsQ);
+        recordsSnap.forEach(d => recentRecords.push(d.data()));
+      } catch (e) {
+        // Permission denied is OK - just show less data
+      }
+    }
+
+    let html = '';
+
+    // Section 1: Score
+    html += '<div class="member-detail-section">';
+    html += '<div class="profile-card-title" style="margin-bottom: 8px;">CURRENT · 最新</div>';
+    if (hos) {
+      html += `<div class="member-stat-row"><span class="member-stat-label">HOSスコア</span><span class="member-stat-value" style="font-size: 22px; background: linear-gradient(135deg, var(--brand-cyan), var(--brand-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">${hos.hosTotal}</span></div>`;
+      html += `<div class="member-stat-row"><span class="member-stat-label">状態</span><span class="member-stat-value" style="color: var(--brand-cyan);">${escapeHtml(hos.stateLabel || '—')}</span></div>`;
+    } else {
+      html += '<div class="member-data-restricted">まだスコアがありません</div>';
+    }
+    html += '</div>';
+
+    // Section 2: Stats (if level >= stats)
+    if ((member.dataLevel === 'stats' || member.dataLevel === 'full' || isYou) && recentRecords.length > 0) {
+      const latest = recentRecords[0];
+      html += '<div class="member-detail-section">';
+      html += '<div class="profile-card-title" style="margin-bottom: 8px;">INDICATORS · 6指標(最新)</div>';
+      const ind = latest.indicators || {};
+      const labels = { sleep: 'SLEEP', hrv: 'HRV', clarity: 'CLARITY', mood: 'MOOD', flow: 'FLOW', fatigue: 'ENERGY' };
+      for (const [key, label] of Object.entries(labels)) {
+        if (ind[key] !== undefined) {
+          html += `<div class="member-stat-row"><span class="member-stat-label">${label}</span><span class="member-stat-value">${ind[key]}</span></div>`;
+        }
+      }
+      html += '</div>';
+
+      // 7-day trend
+      if (recentRecords.length >= 2) {
+        html += '<div class="member-detail-section">';
+        html += '<div class="profile-card-title" style="margin-bottom: 8px;">7-DAY TREND · トレンド</div>';
+        html += '<div class="member-trend-bars">';
+        const reversed = [...recentRecords].reverse();
+        reversed.forEach(r => {
+          const h = (r.hosTotal / 100) * 100;
+          html += `<div class="member-trend-bar" style="height: ${h}%"></div>`;
+        });
+        for (let i = reversed.length; i < 7; i++) {
+          html += '<div class="member-trend-bar empty" style="height: 8%"></div>';
+        }
+        html += '</div>';
+        const avg = Math.round(reversed.reduce((s, r) => s + r.hosTotal, 0) / reversed.length);
+        html += `<div class="member-stat-row"><span class="member-stat-label">7日平均</span><span class="member-stat-value">${avg}</span></div>`;
+        html += '</div>';
+      }
+    }
+
+    // Section 3: Raw data (if level === full)
+    if ((member.dataLevel === 'full' || isYou) && recentRecords.length > 0) {
+      const latest = recentRecords[0];
+      html += '<div class="member-detail-section">';
+      html += '<div class="profile-card-title" style="margin-bottom: 8px;">RAW DATA · 生データ(最新)</div>';
+      if (latest.sleep_hours) html += `<div class="member-stat-row"><span class="member-stat-label">睡眠時間</span><span class="member-stat-value">${latest.sleep_hours} 時間</span></div>`;
+      if (latest.hrv_rmssd) html += `<div class="member-stat-row"><span class="member-stat-label">HRV (RMSSD)</span><span class="member-stat-value">${latest.hrv_rmssd} ms</span></div>`;
+      if (latest.note) {
+        html += `<div style="margin-top: 8px; padding: 10px; background: rgba(0, 0, 0, 0.2); border-radius: var(--r-sm); font-size: 11px; color: var(--text-secondary); line-height: 1.6;">📝 ${escapeHtml(latest.note)}</div>`;
+      }
+      html += '</div>';
+    } else if (member.dataLevel === 'stats' && !isYou) {
+      html += '<div class="member-data-restricted">生データはこのメンバーの設定で非公開です</div>';
+    } else if (member.dataLevel === 'score' && !isYou) {
+      html += '<div class="member-data-restricted">統計データはこのメンバーの設定で非公開です</div>';
+    }
+
+    // Section 4: Member info
+    html += '<div class="member-detail-section">';
+    html += '<div class="profile-card-title" style="margin-bottom: 8px;">MEMBERSHIP · 所属</div>';
+    const dispMode = member.displayPreference === 'real' ? '実名' : member.displayPreference === 'anonymous' ? '匿名' : '非公開';
+    const dataLevel = member.dataLevel === 'score' ? 'スコアのみ' : member.dataLevel === 'stats' ? 'スコア+統計' : 'フル';
+    html += `<div class="member-stat-row"><span class="member-stat-label">表示モード</span><span class="member-stat-value">${dispMode}</span></div>`;
+    html += `<div class="member-stat-row"><span class="member-stat-label">データ共有</span><span class="member-stat-value">${dataLevel}</span></div>`;
+    html += `<div class="member-stat-row"><span class="member-stat-label">役割</span><span class="member-stat-value">${member.role === 'admin' ? '管理者' : 'メンバー'}</span></div>`;
+    html += '</div>';
+
+    content.innerHTML = html;
+  } catch (error) {
+    content.innerHTML = `<div class="member-data-restricted">エラー: ${escapeHtml(error.message)}</div>`;
+  }
+};
+
+window.openSharingSettingsModal = function() {
+  if (!currentGroupId) return;
+  const group = myGroups.find(g => g.id === currentGroupId);
+  if (!group || !group.myMembership) return;
+  const my = group.myMembership;
+
+  // Set current values
+  document.querySelectorAll('input[name="updateDisplay"]').forEach(input => {
+    input.checked = (input.value === my.displayPreference);
+  });
+  document.querySelectorAll('input[name="updateDataLevel"]').forEach(input => {
+    input.checked = (input.value === (my.dataLevel || 'stats'));
+    const label = input.closest('.sharing-option');
+    if (label) label.classList.toggle('selected', input.checked);
+  });
+  document.getElementById('updateNickname').value =
+    (my.displayPreference === 'anonymous' && my.displayName !== currentUser.displayName) ? my.displayName : '';
+  document.getElementById('updateNickname').style.display =
+    my.displayPreference === 'anonymous' ? 'block' : 'none';
+
+  document.getElementById('sharingSettingsModal').classList.add('visible');
+};
+
+window.saveSharingSettings = async function() {
+  if (!currentGroupId) return;
+  const display = document.querySelector('input[name="updateDisplay"]:checked').value;
+  const dataLevel = document.querySelector('input[name="updateDataLevel"]:checked').value;
+  const nickname = document.getElementById('updateNickname').value.trim();
+  if (display === 'anonymous' && !nickname) { alert('ニックネームを入力してください'); return; }
+
+  showLoading(true);
+  try {
+    const memberRef = doc(db, 'groups', currentGroupId, 'members', currentUser.uid);
+    const updates = {
+      displayPreference: display,
+      dataLevel,
+      updatedAt: serverTimestamp()
+    };
+    if (display === 'real') updates.displayName = currentUser.displayName;
+    else if (display === 'anonymous') updates.displayName = nickname;
+    else updates.displayName = 'Hidden';
+
+    await updateDoc(memberRef, updates);
+
+    closeModal('sharingSettingsModal');
+    showLoading(false);
+    haptic(20);
+    await loadMyGroups();
+    await selectGroup(currentGroupId);
+  } catch (error) {
+    showLoading(false);
+    alert('保存失敗: ' + error.message);
+  }
+};
+
+// ========================================
+// INVITE FEATURES
+// ========================================
+window.openInviteModal = function() {
+  if (!currentGroupId) return;
+  const group = myGroups.find(g => g.id === currentGroupId);
+  if (!group) return;
+
+  document.getElementById('inviteCodeDisplay').textContent = group.inviteCode;
+  const link = `${window.location.origin}${window.location.pathname}?invite=${group.inviteCode}`;
+  document.getElementById('inviteLinkDisplay').textContent = link;
+
+  document.getElementById('inviteModal').classList.add('visible');
+};
+
+window.shareLINE = function() {
+  haptic(10);
+  const group = myGroups.find(g => g.id === currentGroupId);
+  if (!group) return;
+  const link = `${window.location.origin}${window.location.pathname}?invite=${group.inviteCode}`;
+  const text = `NEUSENの「${group.name}」グループに招待します\n\n判断OSアプリで一緒にHOSスコアを測りましょう\n\n${link}\n\n招待コード: ${group.inviteCode}`;
+  window.location.href = `https://line.me/R/msg/text/?${encodeURIComponent(text)}`;
+};
+
+window.shareEmail = function() {
+  haptic(10);
+  const group = myGroups.find(g => g.id === currentGroupId);
+  if (!group) return;
+  const link = `${window.location.origin}${window.location.pathname}?invite=${group.inviteCode}`;
+  const subject = `NEUSEN「${group.name}」グループへの招待`;
+  const body = `NEUSENの「${group.name}」グループに招待します。\n\n判断OSアプリで一緒にHOSスコアを測定しましょう。\n\n以下のリンクから参加できます:\n${link}\n\n招待コード: ${group.inviteCode}`;
+  window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+};
+
+window.copyInviteLink = function() {
+  haptic(10);
+  const group = myGroups.find(g => g.id === currentGroupId);
+  if (!group) return;
+  const link = `${window.location.origin}${window.location.pathname}?invite=${group.inviteCode}`;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(link).then(() => {
+      alert('招待リンクをコピーしました');
+    }).catch(() => {
+      prompt('招待リンクをコピーしてください:', link);
+    });
+  } else {
+    prompt('招待リンクをコピーしてください:', link);
+  }
+};
+
+function checkInviteFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  const inviteCode = params.get('invite');
+  if (inviteCode && inviteCode.length === 6) {
+    document.querySelector('[data-tab="groups"]').click();
+    setTimeout(() => openJoinGroupModal(inviteCode.toUpperCase()), 500);
+    history.replaceState({}, '', window.location.pathname);
+  }
+}
+
+function updateDateDisplay() {
+  const today = new Date();
+  document.getElementById('dateDisplay').textContent =
+    `${today.getFullYear()}.${String(today.getMonth()+1).padStart(2,'0')}.${String(today.getDate()).padStart(2,'0')}`;
+}
+
+// ========================================
+// EVENT BINDING
+// ========================================
+document.addEventListener('DOMContentLoaded', () => {
+  // Main sliders
+  ['clarity', 'mood', 'flow', 'fatigue'].forEach(id => {
+    const slider = document.getElementById(id);
+    const value = document.getElementById(id + 'Value');
+    slider.addEventListener('input', () => {
+      value.textContent = slider.value;
+      value.classList.remove('bumping');
+      void value.offsetWidth;
+      value.classList.add('bumping');
+      haptic(3);
+    });
+  });
+
+  // Edit modal sliders
+  ['editClarity', 'editMood', 'editFlow', 'editFatigue'].forEach(id => {
+    const slider = document.getElementById(id);
+    const valId = id + 'Val';
+    slider.addEventListener('input', () => {
+      document.getElementById(valId).textContent = slider.value;
+    });
+  });
+
+  // Flow Session modal sliders
+  ['flowChallenge', 'flowSkill', 'endFlowLevel', 'endTimeDistortion', 'endFocus', 'endOutcome'].forEach(id => {
+    const slider = document.getElementById(id);
+    if (!slider) return;
+    slider.addEventListener('input', () => {
+      const valEl = document.getElementById(id + 'Val');
+      if (valEl) {
+        valEl.textContent = slider.value;
+        haptic(3);
+      }
+    });
+  });
+
+  // Note counter
+  const noteInput = document.getElementById('noteInput');
+  const noteCounter = document.getElementById('noteCounter');
+  noteInput.addEventListener('input', () => {
+    noteCounter.textContent = noteInput.value.length;
+  });
+
+  // Tabs
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      haptic(5);
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+    });
+  });
+
+  document.getElementById('googleSigninBtn').addEventListener('click', window.googleSignIn);
+  document.getElementById('computeBtn').addEventListener('click', window.compute);
+
+  // Close modal on backdrop click
+  document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
+    backdrop.addEventListener('click', (e) => {
+      if (e.target === backdrop) backdrop.classList.remove('visible');
+    });
+  });
+});
+</script>
+
+</body>
+</html>
