@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0A0E27">
+<title>NEUSEN — Human Operating System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --neusen-navy: #0A0E27;
+    --neusen-navy-deep: #050715;
+    --neusen-purple: #6B46C1;
+    --neusen-cyan: #00D4FF;
+    --neusen-mint: #06D6A0;
+    --neusen-text: #FFFFFF;
+    --neusen-text-soft: rgba(255, 255, 255, 0.7);
+    --neusen-text-faint: rgba(255, 255, 255, 0.4);
+    --neusen-border: rgba(255, 255, 255, 0.08);
+    --neusen-card-bg: rgba(255, 255, 255, 0.03);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { width: 100%; overflow-x: hidden; }
+  body {
+    background: 
+      radial-gradient(ellipse at top right, rgba(107, 70, 193, 0.15) 0%, transparent 50%),
+      radial-gradient(ellipse at bottom left, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
+      linear-gradient(180deg, #0A0E27 0%, #050715 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    color: var(--neusen-text);
+    font-family: 'Noto Sans JP', 'Space Grotesk', sans-serif;
+    font-weight: 300;
+    line-height: 1.6;
+    padding: 24px 16px 80px;
+  }
+  .container { max-width: 480px; margin: 0 auto; }
+
+  /* ===== Header ===== */
+  .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--neusen-border); }
+  .brand { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 18px; letter-spacing: 0.25em; }
+  .brand-tag { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.2em; color: var(--neusen-cyan); margin-top: 2px; }
+  .user-info { text-align: right; font-size: 11px; color: var(--neusen-text-soft); }
+  .user-info-name { font-family: 'Space Grotesk', sans-serif; font-weight: 500; }
+  .user-info-date { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--neusen-text-faint); margin-top: 2px; }
+
+  /* ===== Tabs ===== */
+  .tabs { display: flex; gap: 4px; margin-bottom: 24px; background: var(--neusen-card-bg); border-radius: 12px; padding: 4px; border: 1px solid var(--neusen-border); }
+  .tab { flex: 1; padding: 10px; text-align: center; font-family: 'Space Grotesk', sans-serif; font-size: 11px; letter-spacing: 0.15em; font-weight: 500; cursor: pointer; border-radius: 8px; transition: all 0.2s; color: var(--neusen-text-soft); background: transparent; border: none; }
+  .tab.active { background: linear-gradient(135deg, var(--neusen-purple), var(--neusen-cyan)); color: white; }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ===== Login Screen ===== */
+  .login-screen { text-align: center; padding: 60px 20px; }
+  .login-logo { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 36px; letter-spacing: 0.3em; margin-bottom: 8px; background: linear-gradient(135deg, #fff, var(--neusen-cyan), var(--neusen-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .login-tag { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.3em; color: var(--neusen-cyan); margin-bottom: 8px; }
+  .login-tagline { font-size: 14px; color: var(--neusen-text-soft); margin-bottom: 48px; line-height: 1.8; }
+  .google-signin-btn { background: white; color: #444; border: none; border-radius: 12px; padding: 14px 24px; font-family: 'Noto Sans JP', sans-serif; font-weight: 500; font-size: 14px; cursor: pointer; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); display: inline-flex; align-items: center; gap: 12px; transition: all 0.2s; }
+  .google-signin-btn:active { transform: scale(0.98); }
+  .google-icon { width: 18px; height: 18px; }
+  .login-note { margin-top: 32px; font-size: 11px; color: var(--neusen-text-faint); line-height: 1.6; }
+
+  /* ===== HOS Display ===== */
+  .hos-display { background: linear-gradient(165deg, rgba(107, 70, 193, 0.1) 0%, rgba(0, 212, 255, 0.05) 100%); border: 1px solid var(--neusen-border); border-radius: 24px; padding: 28px 24px 24px; text-align: center; margin-bottom: 24px; position: relative; overflow: hidden; }
+  .hos-display::before { content: ''; position: absolute; top: -100px; right: -100px; width: 250px; height: 250px; background: radial-gradient(circle, rgba(107, 70, 193, 0.3) 0%, transparent 70%); pointer-events: none; }
+  .hos-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.3em; color: var(--neusen-text-soft); margin-bottom: 8px; position: relative; }
+  .hos-score { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 84px; line-height: 1; background: linear-gradient(135deg, #FFFFFF 0%, #00D4FF 60%, #6B46C1 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; letter-spacing: -0.02em; position: relative; }
+  .hos-max { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--neusen-text-faint); letter-spacing: 0.1em; margin-top: -4px; position: relative; }
+  .hos-state { font-family: 'Space Grotesk', sans-serif; font-weight: 500; font-size: 18px; margin-top: 12px; letter-spacing: 0.02em; position: relative; }
+  .hos-recommendation { font-size: 12px; color: var(--neusen-cyan); margin-top: 6px; font-weight: 400; position: relative; }
+
+  /* ===== Section ===== */
+  .section { margin-bottom: 20px; }
+  .section-title { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.3em; color: var(--neusen-cyan); margin-bottom: 12px; padding-left: 4px; display: flex; justify-content: space-between; align-items: center; }
+  .section-title-action { color: var(--neusen-text-faint); cursor: pointer; font-size: 9px; }
+
+  /* ===== Auto Data ===== */
+  .auto-data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  .data-input-card { background: var(--neusen-card-bg); border: 1px solid var(--neusen-border); border-radius: 16px; padding: 14px; }
+  .data-input-label { font-family: 'Space Grotesk', sans-serif; font-size: 11px; letter-spacing: 0.15em; color: var(--neusen-text-soft); text-transform: uppercase; margin-bottom: 4px; }
+  .data-input-jp { font-size: 10px; color: var(--neusen-text-faint); margin-bottom: 8px; }
+  .data-input-field { width: 100%; background: rgba(0, 0, 0, 0.3); border: 1px solid var(--neusen-border); border-radius: 8px; color: var(--neusen-text); font-family: 'Space Grotesk', sans-serif; font-weight: 500; font-size: 16px; padding: 6px 10px; text-align: center; }
+  .data-input-field:focus { outline: none; border-color: var(--neusen-cyan); }
+  .data-input-unit { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--neusen-text-faint); text-align: center; margin-top: 4px; }
+  .auto-note { font-size: 10px; color: var(--neusen-text-faint); text-align: center; margin: -4px 0 12px; }
+
+  /* ===== Slider ===== */
+  .slider-card { background: var(--neusen-card-bg); border: 1px solid var(--neusen-border); border-radius: 14px; padding: 14px 16px; margin-bottom: 8px; }
+  .slider-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2px; }
+  .slider-label-en { font-family: 'Space Grotesk', sans-serif; font-weight: 500; font-size: 12px; letter-spacing: 0.15em; text-transform: uppercase; }
+  .slider-value { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 18px; color: var(--neusen-cyan); }
+  .slider-label-jp { font-size: 10px; color: var(--neusen-text-faint); margin-bottom: 10px; }
+  .slider-track-wrapper { position: relative; height: 30px; display: flex; align-items: center; }
+  .slider-input { -webkit-appearance: none; appearance: none; width: 100%; height: 6px; background: rgba(255, 255, 255, 0.1); border-radius: 3px; outline: none; cursor: pointer; }
+  .slider-input::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 22px; height: 22px; background: linear-gradient(135deg, var(--neusen-cyan), var(--neusen-purple)); border: 2px solid white; border-radius: 50%; cursor: pointer; box-shadow: 0 4px 12px rgba(0, 212, 255, 0.4); }
+  .slider-input::-moz-range-thumb { width: 22px; height: 22px; background: linear-gradient(135deg, var(--neusen-cyan), var(--neusen-purple)); border: 2px solid white; border-radius: 50%; cursor: pointer; }
+  .slider-scale { display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--neusen-text-faint); margin-top: 4px; padding: 0 4px; }
+
+  /* ===== Buttons ===== */
+  .compute-btn { width: 100%; background: linear-gradient(135deg, var(--neusen-purple), var(--neusen-cyan)); color: white; border: none; border-radius: 16px; padding: 16px; font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 13px; letter-spacing: 0.2em; cursor: pointer; margin-top: 12px; transition: all 0.2s; box-shadow: 0 8px 24px rgba(107, 70, 193, 0.3); }
+  .compute-btn:active { transform: scale(0.98); }
+  .compute-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .secondary-btn { width: 100%; background: var(--neusen-card-bg); color: var(--neusen-text); border: 1px solid var(--neusen-border); border-radius: 12px; padding: 12px; font-family: 'Noto Sans JP', sans-serif; font-weight: 400; font-size: 13px; cursor: pointer; transition: all 0.2s; margin-top: 8px; }
+  .secondary-btn:hover { border-color: var(--neusen-cyan); }
+
+  /* ===== Group ===== */
+  .group-card { background: var(--neusen-card-bg); border: 1px solid var(--neusen-border); border-radius: 16px; padding: 16px; margin-bottom: 12px; cursor: pointer; transition: all 0.2s; }
+  .group-card:hover { border-color: var(--neusen-cyan); }
+  .group-card.active { border-color: var(--neusen-cyan); background: rgba(0, 212, 255, 0.05); }
+  .group-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .group-name { font-family: 'Space Grotesk', sans-serif; font-weight: 500; font-size: 14px; letter-spacing: 0.05em; }
+  .group-meta { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--neusen-text-faint); }
+  .group-stats { display: flex; gap: 16px; margin-top: 8px; font-size: 11px; color: var(--neusen-text-soft); }
+  .group-stat-value { color: var(--neusen-cyan); font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 14px; }
+
+  /* ===== Member List ===== */
+  .member-row { background: var(--neusen-card-bg); border: 1px solid var(--neusen-border); border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+  .member-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--neusen-purple), var(--neusen-cyan)); display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px; margin-right: 12px; }
+  .member-info { flex-grow: 1; }
+  .member-name { font-size: 13px; font-weight: 500; }
+  .member-date { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--neusen-text-faint); }
+  .member-score { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 18px; }
+  .member-state { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--neusen-cyan); margin-top: 2px; text-align: right; }
+
+  /* ===== Modal ===== */
+  .modal-backdrop { position: fixed; inset: 0; background: rgba(5, 7, 21, 0.85); display: none; align-items: center; justify-content: center; z-index: 100; padding: 20px; }
+  .modal-backdrop.visible { display: flex; }
+  .modal { background: var(--neusen-navy); border: 1px solid var(--neusen-border); border-radius: 20px; padding: 24px; max-width: 400px; width: 100%; }
+  .modal-title { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 16px; letter-spacing: 0.1em; margin-bottom: 16px; }
+  .modal-input { width: 100%; background: rgba(0, 0, 0, 0.3); border: 1px solid var(--neusen-border); border-radius: 10px; padding: 12px; color: var(--neusen-text); font-family: inherit; font-size: 14px; margin-bottom: 12px; }
+  .modal-input:focus { outline: none; border-color: var(--neusen-cyan); }
+  .modal-options { margin-bottom: 16px; }
+  .radio-option { display: flex; align-items: center; padding: 10px; background: var(--neusen-card-bg); border: 1px solid var(--neusen-border); border-radius: 10px; margin-bottom: 6px; cursor: pointer; }
+  .radio-option input { margin-right: 12px; }
+  .radio-option-text { font-size: 13px; }
+  .radio-option-sub { font-size: 11px; color: var(--neusen-text-faint); margin-top: 2px; }
+  .modal-actions { display: flex; gap: 8px; }
+  .modal-actions button { flex: 1; }
+
+  /* ===== Empty State ===== */
+  .empty-state { text-align: center; padding: 32px 16px; color: var(--neusen-text-faint); font-size: 12px; }
+  .empty-state-icon { font-size: 32px; margin-bottom: 8px; opacity: 0.3; }
+
+  /* ===== Status messages ===== */
+  .status-message { background: var(--neusen-card-bg); border-left: 3px solid var(--neusen-cyan); padding: 10px 14px; border-radius: 8px; font-size: 12px; margin-bottom: 12px; color: var(--neusen-text-soft); }
+  .status-message.error { border-left-color: #ff5e6c; }
+  .status-message.success { border-left-color: var(--neusen-mint); }
+
+  /* ===== Footer ===== */
+  .footer { margin-top: 32px; text-align: center; color: var(--neusen-text-faint); font-size: 10px; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.2em; }
+  .footer a { color: var(--neusen-text-faint); text-decoration: none; cursor: pointer; }
+
+  /* ===== History ===== */
+  .history-row { background: var(--neusen-card-bg); border: 1px solid var(--neusen-border); border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; font-size: 12px; }
+  .history-date { font-family: 'JetBrains Mono', monospace; color: var(--neusen-text-soft); font-size: 11px; }
+  .history-score { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 16px; }
+  .history-state { font-size: 10px; color: var(--neusen-cyan); font-family: 'JetBrains Mono', monospace; letter-spacing: 0.1em; }
+
+  .indicator-breakdown { margin-top: 16px; background: var(--neusen-card-bg); border: 1px solid var(--neusen-border); border-radius: 16px; padding: 16px; display: none; }
+  .indicator-breakdown.visible { display: block; }
+  .breakdown-row { display: flex; align-items: center; margin-bottom: 10px; }
+  .breakdown-row:last-child { margin-bottom: 0; }
+  .breakdown-label { font-family: 'Space Grotesk', sans-serif; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; width: 70px; color: var(--neusen-text-soft); }
+  .breakdown-bar-bg { flex-grow: 1; height: 5px; background: rgba(255, 255, 255, 0.05); border-radius: 3px; overflow: hidden; margin: 0 10px; }
+  .breakdown-bar-fill { height: 100%; background: linear-gradient(90deg, var(--neusen-purple), var(--neusen-cyan)); border-radius: 3px; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+  .breakdown-score { font-family: 'JetBrains Mono', monospace; font-size: 11px; width: 26px; text-align: right; }
+
+  /* Loading */
+  .loading-overlay { position: fixed; inset: 0; background: rgba(5, 7, 21, 0.7); display: none; align-items: center; justify-content: center; z-index: 200; }
+  .loading-overlay.visible { display: flex; }
+  .spinner { width: 36px; height: 36px; border: 3px solid rgba(255,255,255,0.1); border-top-color: var(--neusen-cyan); border-radius: 50%; animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- ===== Login Screen ===== -->
+  <div id="loginScreen" class="login-screen">
+    <div class="login-logo">NEUSEN</div>
+    <div class="login-tag">HUMAN OPERATING SYSTEM</div>
+    <div class="login-tagline">あなたの判断品質を可視化する。<br>ゲームの世界に判断OSを。</div>
+    <button class="google-signin-btn" id="googleSigninBtn">
+      <svg class="google-icon" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Googleでログイン
+    </button>
+    <div class="login-note">
+      Googleアカウントでログイン後、<br>
+      あなたのHOSデータがクラウドに安全に保存されます。
+    </div>
+    <div id="firebaseConfigWarning" style="margin-top: 24px; padding: 16px; background: rgba(255, 94, 108, 0.1); border: 1px solid rgba(255, 94, 108, 0.3); border-radius: 12px; font-size: 11px; color: #ff5e6c; text-align: left; display: none;">
+      ⚠️ Firebase未設定<br>
+      <span style="color: var(--neusen-text-soft); font-size: 10px;">
+      コード内のFIREBASE_CONFIGに、ヒロさんのFirebaseプロジェクトの設定値を貼り付けてください。
+      </span>
+    </div>
+  </div>
+
+  <!-- ===== Main App (after login) ===== -->
+  <div id="appScreen" style="display: none;">
+    
+    <!-- Header -->
+    <div class="header">
+      <div>
+        <div class="brand">NEUSEN</div>
+        <div class="brand-tag">HUMAN OS · v17</div>
+      </div>
+      <div class="user-info">
+        <div class="user-info-name" id="userName">—</div>
+        <div class="user-info-date" id="dateDisplay">—</div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" data-tab="measure">MEASURE</button>
+      <button class="tab" data-tab="history">HISTORY</button>
+      <button class="tab" data-tab="groups">GROUPS</button>
+    </div>
+
+    <!-- ===== Measure Tab ===== -->
+    <div class="tab-content active" id="tab-measure">
+      
+      <!-- HOS Display -->
+      <div class="hos-display">
+        <div class="hos-label">HOS SCORE</div>
+        <div class="hos-score" id="hosScore">—</div>
+        <div class="hos-max">/ 100</div>
+        <div class="hos-state" id="hosState">未測定</div>
+        <div class="hos-recommendation" id="hosRecommendation">下のスライダーを動かして測定</div>
+      </div>
+
+      <!-- Auto Data -->
+      <div class="section">
+        <div class="section-title">AUTO DATA · 自動取得想定</div>
+        <div class="auto-data-grid">
+          <div class="data-input-card">
+            <div class="data-input-label">Sleep</div>
+            <div class="data-input-jp">睡眠時間</div>
+            <input type="number" class="data-input-field" id="sleepHours" min="0" max="24" step="0.5" value="7">
+            <div class="data-input-unit">hours</div>
+          </div>
+          <div class="data-input-card">
+            <div class="data-input-label">HRV</div>
+            <div class="data-input-jp">心拍変動</div>
+            <input type="number" class="data-input-field" id="hrvRmssd" min="0" max="200" step="1" value="50">
+            <div class="data-input-unit">ms</div>
+          </div>
+        </div>
+        <div class="auto-note">※ HealthKit連携は今後実装。今は手動入力。</div>
+      </div>
+
+      <!-- Sliders -->
+      <div class="section">
+        <div class="section-title">SUBJECTIVE · 主観入力 (15秒)</div>
+
+        <div class="slider-card">
+          <div class="slider-header">
+            <span class="slider-label-en">CLARITY</span>
+            <span class="slider-value" id="clarityValue">3</span>
+          </div>
+          <div class="slider-label-jp">認知の冴え</div>
+          <div class="slider-track-wrapper">
+            <input type="range" class="slider-input" id="clarity" min="1" max="5" value="3" step="1">
+          </div>
+          <div class="slider-scale"><span>ぼんやり</span><span>普通</span><span>鋭い</span></div>
+        </div>
+
+        <div class="slider-card">
+          <div class="slider-header">
+            <span class="slider-label-en">MOOD</span>
+            <span class="slider-value" id="moodValue">3</span>
+          </div>
+          <div class="slider-label-jp">感情の安定</div>
+          <div class="slider-track-wrapper">
+            <input type="range" class="slider-input" id="mood" min="1" max="5" value="3" step="1">
+          </div>
+          <div class="slider-scale"><span>不安定</span><span>普通</span><span>落ち着き</span></div>
+        </div>
+
+        <div class="slider-card">
+          <div class="slider-header">
+            <span class="slider-label-en">FLOW</span>
+            <span class="slider-value" id="flowValue">3</span>
+          </div>
+          <div class="slider-label-jp">フロー誘導性</div>
+          <div class="slider-track-wrapper">
+            <input type="range" class="slider-input" id="flow" min="1" max="5" value="3" step="1">
+          </div>
+          <div class="slider-scale"><span>散漫</span><span>普通</span><span>すぐゾーン</span></div>
+        </div>
+
+        <div class="slider-card">
+          <div class="slider-header">
+            <span class="slider-label-en">FATIGUE</span>
+            <span class="slider-value" id="fatigueValue">3</span>
+          </div>
+          <div class="slider-label-jp">判断疲労(高いほど元気)</div>
+          <div class="slider-track-wrapper">
+            <input type="range" class="slider-input" id="fatigue" min="1" max="5" value="3" step="1">
+          </div>
+          <div class="slider-scale"><span>疲弊</span><span>普通</span><span>絶好調</span></div>
+        </div>
+      </div>
+
+      <button class="compute-btn" id="computeBtn">HOS を測定する</button>
+      <div id="saveStatus" style="margin-top: 12px;"></div>
+
+      <!-- Indicator Breakdown -->
+      <div class="indicator-breakdown" id="indicatorBreakdown">
+        <div class="section-title" style="margin-bottom: 12px;">BREAKDOWN · 内訳</div>
+        <div id="breakdownContent"></div>
+      </div>
+    </div>
+
+    <!-- ===== History Tab ===== -->
+    <div class="tab-content" id="tab-history">
+      <div class="section-title">YOUR RECORDS · あなたの記録</div>
+      <div id="historyList">
+        <div class="empty-state">
+          <div class="empty-state-icon">📊</div>
+          まだ記録がありません
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== Groups Tab ===== -->
+    <div class="tab-content" id="tab-groups">
+      <div class="section-title">
+        <span>YOUR GROUPS · 参加中</span>
+        <span class="section-title-action" onclick="openCreateGroupModal()">+ 作成</span>
+      </div>
+      <div id="groupList">
+        <div class="empty-state">
+          <div class="empty-state-icon">👥</div>
+          まだグループに参加していません
+        </div>
+      </div>
+
+      <button class="secondary-btn" onclick="openJoinGroupModal()">招待コードで参加</button>
+      
+      <div id="groupDetailSection" style="display: none; margin-top: 24px;">
+        <div class="section-title">
+          <span id="currentGroupTitle">GROUP MEMBERS</span>
+          <span class="section-title-action" onclick="copyInviteCode()">招待コードをコピー</span>
+        </div>
+        <div id="memberList"></div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      NEUSEN · HUMAN OPERATING SYSTEM<br>
+      © 2026 株式会社NEUSEN<br><br>
+      <a onclick="signOut()">ログアウト</a>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Create Group Modal ===== -->
+<div class="modal-backdrop" id="createGroupModal">
+  <div class="modal">
+    <div class="modal-title">グループを作成</div>
+    <input type="text" class="modal-input" id="newGroupName" placeholder="グループ名(例: NEUSEN社内)">
+    <div class="modal-options">
+      <label class="radio-option">
+        <input type="radio" name="visibility" value="real" checked>
+        <div>
+          <div class="radio-option-text">実名グループ</div>
+          <div class="radio-option-sub">メンバーの名前と顔写真を表示</div>
+        </div>
+      </label>
+      <label class="radio-option">
+        <input type="radio" name="visibility" value="anonymous">
+        <div>
+          <div class="radio-option-text">匿名グループ</div>
+          <div class="radio-option-sub">ニックネームのみ表示</div>
+        </div>
+      </label>
+    </div>
+    <div class="modal-actions">
+      <button class="secondary-btn" onclick="closeModal('createGroupModal')">キャンセル</button>
+      <button class="compute-btn" onclick="createGroup()" style="margin-top: 0;">作成</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Join Group Modal ===== -->
+<div class="modal-backdrop" id="joinGroupModal">
+  <div class="modal">
+    <div class="modal-title">グループに参加</div>
+    <input type="text" class="modal-input" id="inviteCodeInput" placeholder="招待コード(6文字)" maxlength="6" style="text-transform: uppercase;">
+    <div class="modal-options">
+      <label class="radio-option">
+        <input type="radio" name="myDisplay" value="real" checked>
+        <div>
+          <div class="radio-option-text">実名で参加</div>
+          <div class="radio-option-sub">あなたの名前が表示されます</div>
+        </div>
+      </label>
+      <label class="radio-option">
+        <input type="radio" name="myDisplay" value="anonymous">
+        <div>
+          <div class="radio-option-text">匿名で参加</div>
+          <div class="radio-option-sub">ニックネームを設定してください</div>
+        </div>
+      </label>
+    </div>
+    <input type="text" class="modal-input" id="nicknameInput" placeholder="ニックネーム(匿名時)" style="display: none;">
+    <div class="modal-actions">
+      <button class="secondary-btn" onclick="closeModal('joinGroupModal')">キャンセル</button>
+      <button class="compute-btn" onclick="joinGroup()" style="margin-top: 0;">参加</button>
+    </div>
+  </div>
+</div>
+
+<!-- Loading -->
+<div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div></div>
+
+<!-- Firebase SDK (modular v10+) -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut as fbSignOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc, collection, addDoc, query, where, orderBy, limit, getDocs, serverTimestamp, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// =====================================================================
+// Firebase設定 - ヒロさんが自分のFirebaseプロジェクトの値に置き換える
+// =====================================================================
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyBIiVnTE2UjekzHAuv-xzKjD7r-4W_PPCs",
+  authDomain: "neusen-app.firebaseapp.com",
+  projectId: "neusen-app",
+  storageBucket: "neusen-app.firebasestorage.app",
+  messagingSenderId: "738602817673",
+  appId: "1:738602817673:web:7a2b03f23f4c24efa8ce58",
+  measurementId: "G-340VSS3T0R"
+};
+
+// 設定が未完了かチェック
+const isFirebaseConfigured = !FIREBASE_CONFIG.apiKey.startsWith("REPLACE_WITH");
+
+let app, auth, db, currentUser = null;
+let currentGroupId = null;
+let myGroups = [];
+
+if (isFirebaseConfigured) {
+  app = initializeApp(FIREBASE_CONFIG);
+  auth = getAuth(app);
+  db = getFirestore(app);
+  
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      currentUser = user;
+      await ensureUserDocument(user);
+      showApp();
+      await loadMyGroups();
+      await loadHistory();
+    } else {
+      currentUser = null;
+      showLogin();
+    }
+  });
+} else {
+  document.getElementById('firebaseConfigWarning').style.display = 'block';
+}
+
+// ===== Auth =====
+window.googleSignIn = async function() {
+  if (!isFirebaseConfigured) {
+    alert('Firebase未設定です。コード内のFIREBASE_CONFIGを設定してください。');
+    return;
+  }
+  showLoading(true);
+  try {
+    const provider = new GoogleAuthProvider();
+    await signInWithPopup(auth, provider);
+  } catch (error) {
+    console.error('Sign in error:', error);
+    alert('ログインに失敗しました: ' + error.message);
+  }
+  showLoading(false);
+};
+
+window.signOut = async function() {
+  if (confirm('ログアウトしますか?')) {
+    await fbSignOut(auth);
+  }
+};
+
+async function ensureUserDocument(user) {
+  const userRef = doc(db, 'users', user.uid);
+  const userSnap = await getDoc(userRef);
+  if (!userSnap.exists()) {
+    await setDoc(userRef, {
+      email: user.email,
+      displayName: user.displayName || 'User',
+      photoURL: user.photoURL || null,
+      createdAt: serverTimestamp()
+    });
+  }
+}
+
+function showLogin() {
+  document.getElementById('loginScreen').style.display = 'block';
+  document.getElementById('appScreen').style.display = 'none';
+}
+
+function showApp() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('appScreen').style.display = 'block';
+  document.getElementById('userName').textContent = currentUser.displayName || 'User';
+  updateDateDisplay();
+}
+
+function showLoading(visible) {
+  document.getElementById('loadingOverlay').classList.toggle('visible', visible);
+}
+
+function showStatus(message, type = '') {
+  const el = document.getElementById('saveStatus');
+  el.innerHTML = `<div class="status-message ${type}">${message}</div>`;
+  if (type === 'success') {
+    setTimeout(() => { el.innerHTML = ''; }, 3000);
+  }
+}
+
+// ===== HOS Calculation (same as v16) =====
+const WEIGHTS = { sleep: 0.20, hrv: 0.20, clarity: 0.15, mood: 0.15, flow: 0.15, fatigue: 0.15 };
+
+function clamp(v, mn, mx) { return Math.min(Math.max(v, mn), mx); }
+function avg(arr) { return arr.length === 0 ? 0 : arr.reduce((a,b) => a+b, 0) / arr.length; }
+
+function calcSleep(h) {
+  if (!h || h <= 0) return { score: 50, confidence: 0 };
+  let s;
+  if (h >= 7.5) s = 90; else if (h >= 7.0) s = 80; else if (h >= 6.5) s = 70;
+  else if (h >= 6.0) s = 60; else if (h >= 5.0) s = 40; else s = 20;
+  return { score: clamp(s + 10, 0, 100), confidence: 1.0 };
+}
+function calcHRV(h) {
+  if (!h || h <= 0) return { score: 50, confidence: 0 };
+  let s;
+  if (h >= 70) s = 95; else if (h >= 50) s = 80; else if (h >= 35) s = 65;
+  else if (h >= 20) s = 50; else s = 30;
+  return { score: s, confidence: 1.0 };
+}
+function calcSlider(v) { return { score: (v - 1) * 25, confidence: 1.0 }; }
+function calcFlow(v, hrvScore) {
+  let s = (v - 1) * 25;
+  if (hrvScore >= 80 && v >= 4) s += 10;
+  return { score: clamp(s, 0, 100), confidence: 1.0 };
+}
+function calcFatigue(v) {
+  return { score: (v - 1) * 25 * 0.3 + 60 * 0.7, confidence: 1.0 };
+}
+
+function calculateHOS(input) {
+  const sleep = calcSleep(input.sleep_hours);
+  const hrv = calcHRV(input.hrv_rmssd);
+  const clarity = calcSlider(input.clarity);
+  const mood = calcSlider(input.mood);
+  const flow = calcFlow(input.flow, hrv.score);
+  const fatigue = calcFatigue(input.fatigue);
+  
+  const total = Math.round(
+    sleep.score * WEIGHTS.sleep + hrv.score * WEIGHTS.hrv +
+    clarity.score * WEIGHTS.clarity + mood.score * WEIGHTS.mood +
+    flow.score * WEIGHTS.flow + fatigue.score * WEIGHTS.fatigue
+  );
+  
+  return {
+    total,
+    indicators: { sleep, hrv, clarity, mood, flow, fatigue },
+    state_label: getState(total),
+    recommendation: getRec(total, { sleep, hrv, clarity, mood, flow, fatigue })
+  };
+}
+
+function getState(s) {
+  if (s >= 90) return 'Peak State';
+  if (s >= 80) return 'Sharp Mind';
+  if (s >= 70) return 'Decision Ready';
+  if (s >= 60) return 'Steady';
+  if (s >= 50) return 'Low Resolution';
+  if (s >= 40) return 'Foggy';
+  return 'Reset Required';
+}
+
+function getRec(total, ind) {
+  let weakest = 'sleep', minScore = 100;
+  for (const [k, v] of Object.entries(ind)) {
+    if (v.score < minScore) { minScore = v.score; weakest = k; }
+  }
+  if (total >= 85) return '今日は判断のゴールデンタイム';
+  if (total >= 70) {
+    if (weakest === 'sleep') return '重要な判断は午前中に';
+    if (weakest === 'hrv') return '深呼吸してから判断を';
+    if (weakest === 'fatigue') return '判断は午前3つまでに';
+    return '通常運転OK、大胆な判断は明日に';
+  }
+  if (total >= 55) {
+    if (weakest === 'sleep') return '判断より、まず10分の仮眠を';
+    if (weakest === 'mood') return '感情を整えてから判断を';
+    if (weakest === 'flow') return '今日は深い思考を避けて';
+    return '判断より運動と睡眠を優先';
+  }
+  return '今日は決めない勇気を';
+}
+
+// ===== Compute & Save =====
+window.compute = async function() {
+  const input = {
+    sleep_hours: parseFloat(document.getElementById('sleepHours').value) || 0,
+    hrv_rmssd: parseFloat(document.getElementById('hrvRmssd').value) || 0,
+    clarity: parseInt(document.getElementById('clarity').value),
+    mood: parseInt(document.getElementById('mood').value),
+    flow: parseInt(document.getElementById('flow').value),
+    fatigue: parseInt(document.getElementById('fatigue').value)
+  };
+  
+  const result = calculateHOS(input);
+  animateScore(result.total);
+  document.getElementById('hosState').textContent = result.state_label;
+  document.getElementById('hosRecommendation').textContent = result.recommendation;
+  renderBreakdown(result.indicators);
+  
+  // Save to Firestore
+  showStatus('保存中...', '');
+  try {
+    const recordsRef = collection(db, 'users', currentUser.uid, 'hosRecords');
+    await addDoc(recordsRef, {
+      date: new Date().toISOString(),
+      sleep_hours: input.sleep_hours,
+      hrv_rmssd: input.hrv_rmssd,
+      clarity: input.clarity,
+      mood: input.mood,
+      flow: input.flow,
+      fatigue: input.fatigue,
+      hosTotal: result.total,
+      stateLabel: result.state_label,
+      indicators: {
+        sleep: result.indicators.sleep.score,
+        hrv: result.indicators.hrv.score,
+        clarity: result.indicators.clarity.score,
+        mood: result.indicators.mood.score,
+        flow: result.indicators.flow.score,
+        fatigue: result.indicators.fatigue.score
+      },
+      createdAt: serverTimestamp()
+    });
+    
+    // Update group snapshots
+    for (const groupId of myGroups.map(g => g.id)) {
+      const snapshotRef = doc(db, 'groupSnapshots', groupId, 'latest', currentUser.uid);
+      await setDoc(snapshotRef, {
+        userId: currentUser.uid,
+        hosTotal: result.total,
+        stateLabel: result.state_label,
+        recordedAt: serverTimestamp()
+      });
+    }
+    
+    showStatus('✓ クラウドに保存しました', 'success');
+    await loadHistory();
+  } catch (error) {
+    console.error('Save error:', error);
+    showStatus('保存に失敗しました: ' + error.message, 'error');
+  }
+};
+
+function animateScore(target) {
+  const el = document.getElementById('hosScore');
+  const current = parseInt(el.textContent) || 0;
+  const start = performance.now();
+  const dur = 800;
+  function step(now) {
+    const p = Math.min((now - start) / dur, 1);
+    const eased = 1 - Math.pow(1 - p, 3);
+    el.textContent = Math.round(current + (target - current) * eased);
+    if (p < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+function renderBreakdown(ind) {
+  const labels = { sleep: 'SLEEP', hrv: 'HRV', clarity: 'CLARITY', mood: 'MOOD', flow: 'FLOW', fatigue: 'FATIGUE' };
+  const order = ['sleep', 'hrv', 'clarity', 'mood', 'flow', 'fatigue'];
+  document.getElementById('breakdownContent').innerHTML = order.map(k => `
+    <div class="breakdown-row">
+      <div class="breakdown-label">${labels[k]}</div>
+      <div class="breakdown-bar-bg"><div class="breakdown-bar-fill" style="width: ${ind[k].score}%"></div></div>
+      <div class="breakdown-score">${Math.round(ind[k].score)}</div>
+    </div>
+  `).join('');
+  document.getElementById('indicatorBreakdown').classList.add('visible');
+}
+
+// ===== History =====
+async function loadHistory() {
+  if (!currentUser) return;
+  try {
+    const q = query(
+      collection(db, 'users', currentUser.uid, 'hosRecords'),
+      orderBy('createdAt', 'desc'),
+      limit(30)
+    );
+    const snap = await getDocs(q);
+    const list = document.getElementById('historyList');
+    if (snap.empty) {
+      list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📊</div>まだ記録がありません</div>';
+      return;
+    }
+    let html = '';
+    let dayNum = snap.size;
+    snap.forEach(d => {
+      const r = d.data();
+      const date = new Date(r.date);
+      const dateStr = `${String(date.getMonth()+1).padStart(2,'0')}/${String(date.getDate()).padStart(2,'0')}`;
+      html += `<div class="history-row">
+        <span class="history-date">${dateStr} · DAY ${dayNum}</span>
+        <span class="history-state">${r.stateLabel}</span>
+        <span class="history-score">${r.hosTotal}</span>
+      </div>`;
+      dayNum--;
+    });
+    list.innerHTML = html;
+  } catch (error) {
+    console.error('History load error:', error);
+  }
+}
+
+// ===== Groups =====
+function generateInviteCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code = '';
+  for (let i = 0; i < 6; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+  return code;
+}
+
+window.openCreateGroupModal = function() {
+  document.getElementById('newGroupName').value = '';
+  document.getElementById('createGroupModal').classList.add('visible');
+};
+
+window.openJoinGroupModal = function() {
+  document.getElementById('inviteCodeInput').value = '';
+  document.getElementById('joinGroupModal').classList.add('visible');
+  // Toggle nickname field
+  document.querySelectorAll('input[name="myDisplay"]').forEach(r => {
+    r.addEventListener('change', (e) => {
+      document.getElementById('nicknameInput').style.display = e.target.value === 'anonymous' ? 'block' : 'none';
+    });
+  });
+};
+
+window.closeModal = function(id) {
+  document.getElementById(id).classList.remove('visible');
+};
+
+window.createGroup = async function() {
+  const name = document.getElementById('newGroupName').value.trim();
+  if (!name) { alert('グループ名を入力してください'); return; }
+  
+  const visibility = document.querySelector('input[name="visibility"]:checked').value;
+  const inviteCode = generateInviteCode();
+  
+  showLoading(true);
+  try {
+    // Create group
+    const groupRef = await addDoc(collection(db, 'groups'), {
+      name,
+      createdBy: currentUser.uid,
+      inviteCode,
+      visibilityMode: visibility,
+      createdAt: serverTimestamp(),
+      memberCount: 1
+    });
+    
+    // Add creator as member
+    await setDoc(doc(db, 'groups', groupRef.id, 'members', currentUser.uid), {
+      userId: currentUser.uid,
+      displayName: currentUser.displayName,
+      role: 'admin',
+      displayPreference: 'real',
+      joinedAt: serverTimestamp()
+    });
+    
+    showLoading(false);
+    closeModal('createGroupModal');
+    alert(`グループ作成完了\n招待コード: ${inviteCode}`);
+    await loadMyGroups();
+  } catch (error) {
+    showLoading(false);
+    console.error('Create group error:', error);
+    alert('グループ作成失敗: ' + error.message);
+  }
+};
+
+window.joinGroup = async function() {
+  const code = document.getElementById('inviteCodeInput').value.trim().toUpperCase();
+  if (code.length !== 6) { alert('6文字の招待コードを入力してください'); return; }
+  
+  const display = document.querySelector('input[name="myDisplay"]:checked').value;
+  const nickname = document.getElementById('nicknameInput').value.trim();
+  if (display === 'anonymous' && !nickname) { alert('ニックネームを入力してください'); return; }
+  
+  showLoading(true);
+  try {
+    // Find group by invite code
+    const q = query(collection(db, 'groups'), where('inviteCode', '==', code), limit(1));
+    const snap = await getDocs(q);
+    if (snap.empty) { showLoading(false); alert('招待コードが見つかりません'); return; }
+    
+    const groupDoc = snap.docs[0];
+    const groupId = groupDoc.id;
+    
+    // Check if already member
+    const memberRef = doc(db, 'groups', groupId, 'members', currentUser.uid);
+    const memberSnap = await getDoc(memberRef);
+    if (memberSnap.exists()) { showLoading(false); alert('既に参加済みです'); return; }
+    
+    // Add as member
+    await setDoc(memberRef, {
+      userId: currentUser.uid,
+      displayName: display === 'real' ? currentUser.displayName : nickname,
+      role: 'member',
+      displayPreference: display,
+      joinedAt: serverTimestamp()
+    });
+    
+    showLoading(false);
+    closeModal('joinGroupModal');
+    alert(`「${groupDoc.data().name}」に参加しました`);
+    await loadMyGroups();
+  } catch (error) {
+    showLoading(false);
+    console.error('Join error:', error);
+    alert('参加失敗: ' + error.message);
+  }
+};
+
+async function loadMyGroups() {
+  if (!currentUser) return;
+  try {
+    // Get all groups, then filter by membership
+    const allGroups = await getDocs(collection(db, 'groups'));
+    myGroups = [];
+    
+    for (const g of allGroups.docs) {
+      const memberSnap = await getDoc(doc(db, 'groups', g.id, 'members', currentUser.uid));
+      if (memberSnap.exists()) {
+        myGroups.push({ id: g.id, ...g.data() });
+      }
+    }
+    
+    renderGroupList();
+  } catch (error) {
+    console.error('Load groups error:', error);
+  }
+}
+
+function renderGroupList() {
+  const list = document.getElementById('groupList');
+  if (myGroups.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">👥</div>まだグループに参加していません</div>';
+    return;
+  }
+  list.innerHTML = myGroups.map(g => `
+    <div class="group-card" onclick="selectGroup('${g.id}')">
+      <div class="group-card-header">
+        <div class="group-name">${g.name}</div>
+        <div class="group-meta">${g.visibilityMode === 'anonymous' ? '匿名' : '実名'}</div>
+      </div>
+      <div class="group-stats">
+        <span>メンバー <span class="group-stat-value">${g.memberCount || '—'}</span></span>
+        <span>コード <span class="group-stat-value">${g.inviteCode}</span></span>
+      </div>
+    </div>
+  `).join('');
+}
+
+window.selectGroup = async function(groupId) {
+  currentGroupId = groupId;
+  const group = myGroups.find(g => g.id === groupId);
+  document.getElementById('currentGroupTitle').textContent = group.name + ' · MEMBERS';
+  document.getElementById('groupDetailSection').style.display = 'block';
+  
+  // Load members and their latest HOS
+  showLoading(true);
+  try {
+    const membersSnap = await getDocs(collection(db, 'groups', groupId, 'members'));
+    const memberList = document.getElementById('memberList');
+    
+    let html = '';
+    for (const m of membersSnap.docs) {
+      const member = m.data();
+      let displayName = member.displayName;
+      if (group.visibilityMode === 'anonymous' && member.displayPreference !== 'real') {
+        displayName = displayName || 'Anonymous';
+      }
+      
+      // Get latest HOS
+      const snapRef = doc(db, 'groupSnapshots', groupId, 'latest', m.id);
+      const snapDoc = await getDoc(snapRef);
+      const hos = snapDoc.exists() ? snapDoc.data() : null;
+      
+      const initial = displayName.charAt(0).toUpperCase();
+      html += `
+        <div class="member-row">
+          <div class="member-avatar">${initial}</div>
+          <div class="member-info">
+            <div class="member-name">${displayName}</div>
+            <div class="member-date">${hos ? '記録あり' : '未記録'}</div>
+          </div>
+          <div style="text-align: right;">
+            <div class="member-score">${hos ? hos.hosTotal : '—'}</div>
+            <div class="member-state">${hos ? hos.stateLabel : ''}</div>
+          </div>
+        </div>
+      `;
+    }
+    memberList.innerHTML = html;
+  } catch (error) {
+    console.error('Load members error:', error);
+  }
+  showLoading(false);
+};
+
+window.copyInviteCode = function() {
+  if (!currentGroupId) return;
+  const group = myGroups.find(g => g.id === currentGroupId);
+  if (group) {
+    navigator.clipboard.writeText(group.inviteCode);
+    alert('招待コード「' + group.inviteCode + '」をコピーしました');
+  }
+};
+
+// ===== UI Setup =====
+function updateDateDisplay() {
+  const today = new Date();
+  document.getElementById('dateDisplay').textContent = 
+    `${today.getFullYear()}.${String(today.getMonth()+1).padStart(2,'0')}.${String(today.getDate()).padStart(2,'0')}`;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Sliders
+  ['clarity', 'mood', 'flow', 'fatigue'].forEach(id => {
+    const slider = document.getElementById(id);
+    const value = document.getElementById(id + 'Value');
+    slider.addEventListener('input', () => { value.textContent = slider.value; });
+  });
+  
+  // Tabs
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+    });
+  });
+  
+  // Buttons
+  document.getElementById('googleSigninBtn').addEventListener('click', window.googleSignIn);
+  document.getElementById('computeBtn').addEventListener('click', window.compute);
+});
+</script>
+
+</body>
+</html>
